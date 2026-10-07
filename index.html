@@ -140,7 +140,7 @@ h1>span,h2{display:flex;align-items:center}
 h2 .ic{color:var(--muted)}
 .act{display:grid;justify-items:start}
 .tabbar button svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tl li .k{display:flex;align-items:center;flex-wrap:wrap;gap:0 6px}
+.tl li .k{display:flex;align-items:center;flex-wrap:wrap;gap:0 6px;min-width:0} .tl li .k .note{font-size:.78rem}
 .tl li.meal .k .ic{color:var(--meal)} .tl li.stick .k .ic{color:var(--stick)}
 .tl li button{display:flex;align-items:center} .tl li button .ic{margin:0}
 .sleep div span{display:flex;align-items:center}
@@ -197,12 +197,14 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .tile .d .ic{width:12px;height:12px;margin:0}
 .tile.good .v{color:var(--meal)}
 .hours{display:grid;gap:8px}
-.hours div{display:grid;grid-template-columns:64px 1fr 40px;align-items:center;gap:10px;font-size:.85rem}
+.hours>div{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:10px;font-size:.85rem}
+.hours .lb{display:grid;line-height:1.15} .hours .lb small{color:var(--muted);font-size:.7rem}
 .hours .bar{height:12px;background:var(--bg);border-radius:6px;overflow:hidden}
 .hours .bar i{display:block;height:100%;background:var(--stick);border-radius:6px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
 .hours .bar i.night{background:var(--wait)}
-.hours .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
-.heat{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.hours .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap;font-size:.8rem}
+.heat{display:grid;grid-template-columns:auto repeat(12,1fr);gap:3px}
+.heat .lbl{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;font-size:.6rem;color:var(--muted);padding-right:3px} .heat .lbl span{display:flex;align-items:center}
 .heat .col{display:grid;grid-template-rows:repeat(7,1fr);gap:3px}
 .heat i{display:block;aspect-ratio:1;border-radius:3px;background:var(--bg);border:1px solid var(--line)}
 .heat i.l1,.heatLegend i.l1{background:color-mix(in srgb,var(--meal) 30%,var(--bg))}
@@ -285,7 +287,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </div>
   <p class="empty" id="histEmpty">Ще немає записів.</p>
   <section class="card report" id="report" hidden><h2><svg class="ic"><use href="#i-sparkles"/></svg><span id="reportTitle">Підсумок</span></h2><div id="reportBody"></div></section>
-  <section id="grpSticks"><h2 class="grp"><svg class="ic"><use href="#i-stick"/></svg>Стіки</h2><div class="tiles" id="tilesSticks"></div></section>
+  <section id="grpSticks"><h2 class="grp"><svg class="ic"><use href="#i-stick"/></svg>Стіки</h2><p class="note" id="trendNote" style="margin:0 0 8px"></p><div class="tiles" id="tilesSticks"></div></section>
   <section class="card" id="histChartCard"><h2><svg class="ic"><use href="#i-chart"/></svg><span id="histChartTitle">Стіки по днях</span></h2><div class="week" id="histChart"></div></section>
   <section class="card"><h2><svg class="ic"><use href="#i-clock"/></svg>Коли курю</h2><div class="hours" id="hours"></div></section>
   <section id="grpFood"><h2 class="grp"><svg class="ic"><use href="#i-meal"/></svg>Їжа та жовчний</h2><div class="tiles" id="tilesFood"></div></section>
@@ -318,7 +320,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">16</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">17</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -516,7 +518,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     const ev=[...today.meals.map(t=>({k:"meal",t})),...today.sticks.map(t=>({k:"stick",t})),...(today.wake?[{k:"wake",t:today.wake}]:[]),...(today.sleep?[{k:"sleep",t:today.sleep}]:[])].sort((a,b)=>a.t-b.t);
     $("tlEmpty").hidden=ev.length>0;
     $("timeline").innerHTML=ev.map(e=>{
-      let note=""; if(e.k==="stick"){const prev=[...today.meals].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)} після їжі`:"натщесерце";}
+      let note=""; if(e.k==="stick"){const prev=[...today.meals].reverse().find(m=>m<=e.t);note=prev?`+${fmtDur(e.t-prev)} після їжі`:"натщесерце";}
       else{note="";}
       const label=e.k==="meal"?(today.types[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон";
       const ico={meal:"meal",stick:"stick",wake:"sunrise",sleep:"moon"}[e.k];
@@ -591,10 +593,10 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   function fmtH(min){if(min===null||min===undefined)return "–";const h=Math.floor(min/60),m=Math.round(min%60);return h?`${h} год${m?` ${m} хв`:""}`:`${m} хв`;}
   function delta(cur,prev,lowerIsBetter=true,unit=""){ // trend chip vs previous period
     if(cur===null||prev===null||prev===undefined)return "";
-    const d=cur-prev; if(Math.abs(d)<0.05)return `<div class="d flat"><svg class="ic"><use href="#i-flat"/></svg>як минулого разу</div>`;
+    const d=cur-prev; if(Math.abs(d)<0.05)return `<div class="d flat"><svg class="ic"><use href="#i-flat"/></svg>без змін</div>`;
     const better=lowerIsBetter?d<0:d>0; const pct=prev?Math.round(Math.abs(d)/Math.abs(prev)*100):null;
     const num=Number.isInteger(cur)&&Number.isInteger(prev)?Math.abs(d).toFixed(0):Math.abs(d).toFixed(unit===" хв"||unit==="%"?0:1);
-    return `<div class="d ${better?"down":"up"}"><svg class="ic"><use href="#i-${d<0?"down":"up"}"/></svg>${d>0?"+":"−"}${num}${unit}${pct!==null?` (${pct}%)`:""} до минулого</div>`;
+    return `<div class="d ${better?"down":"up"}" title="порівняно з попереднім періодом"><svg class="ic"><use href="#i-${d<0?"down":"up"}"/></svg>${d>0?"+":"−"}${num}${unit}${pct!==null&&unit!=="%"?` · ${pct}%`:""}</div>`;
   }
   function streaks(){ // days within limit, ending today/yesterday
     const keys=Object.keys(allDays).sort(); let cur=0,best=0,run=0,prev=null;
@@ -632,8 +634,9 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     const chartKeys=isDay?lastKeys(7):lastKeys(span);
     const keys=isDay?keysAll.slice(0,60):chartKeys.slice().reverse();
     const cur=periodAgg(isDay?[dayKey()]:chartKeys), prev=isDay?periodAgg(lastKeys(1,1)):periodAgg(lastKeys(span,span));
-    const stk=streaks(); const dLabel=isDay?"до вчора":"до минулого";
-    const dl=(c,p,low,unit)=>prev.logged?delta(c,p,low,unit).replace("до минулого",dLabel):"";
+    const stk=streaks();
+    $("trendNote").textContent=prev.logged?`Стрілки - порівняно з ${isDay?"учорашнім днем":period==="month"?"попередніми 30 днями":"попереднім тижнем"}.`:"";
+    const dl=(c,p,low,unit)=>prev.logged?delta(c,p,low,unit):"";
     const lim=settings.limit, g=settings.gap;
     // ---- sticks
     let t="";
@@ -657,8 +660,8 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     }
     $("tilesSticks").innerHTML=t;
     // ---- hours
-    const bt=cur.buckets.reduce((a,b)=>a+b,0);
-    $("hours").innerHTML=BUCKETS.map((b,i)=>{const v=cur.buckets[i];const pct=bt?Math.round(v/bt*100):0;return `<div><span>${b}<small class="note"> ${["5–12","12–17","17–22","22–5"][i]}</small></span><div class="bar"><i class="${i===3?"night":""}" data-w="${pct}" style="width:0"></i></div><span class="n">${v}${bt?` · ${pct}%`:""}</span></div>`;}).join("");
+    const bt=cur.buckets.reduce((a,b)=>a+b,0), bmax=Math.max(1,...cur.buckets);
+    $("hours").innerHTML=BUCKETS.map((b,i)=>{const v=cur.buckets[i];const pct=bt?Math.round(v/bt*100):0;return `<div><span class="lb">${b}<small>${["5–12","12–17","17–22","22–5"][i]}</small></span><div class="bar"><i class="${i===3?"night":""}" data-w="${Math.round(v/bmax*100)}" style="width:0"></i></div><span class="n">${v}${bt?` · ${pct}%`:""}</span></div>`;}).join("");
     requestAnimationFrame(()=>requestAnimationFrame(()=>$("hours").querySelectorAll("i").forEach(i=>i.style.width=i.dataset.w+"%")));
     // ---- food
     t="";
@@ -713,7 +716,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
       let lv="";if(rec){lv=n===0?"l0":lim?(n>lim?(n>lim*1.5?"l5":"l4"):n<=lim/3?"l1":n<=lim*2/3?"l2":"l3"):"l3";}
       col+=`<i class="${lv}${k===todayK?" today":""}${future?" future":""}" title="${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}: ${rec?n:"–"}"></i>`;}
       cols+=`<div class="col">${col}</div>`;}
-    $("heat").innerHTML=cols;
+    $("heat").innerHTML=`<div class="lbl">${["пн","","ср","","пт","","нд"].map(x=>`<span>${x}</span>`).join("")}</div>`+cols;
     // ---- list
     $("histListTitle").textContent=isDay?"Усі дні":"Дні періоду";
     $("histList").innerHTML=keys.filter(k=>allDays[k]).map(k=>{
