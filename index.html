@@ -93,6 +93,7 @@ details summary::after{content:"+";color:var(--muted)} details[open] summary::af
 .filebtn{display:flex;align-items:center;justify-content:center;font-weight:500;padding:12px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
 
 .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.tab{display:grid;gap:14px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
 .tabbar button{background:none;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:500;display:grid;justify-items:center;gap:2px;padding:4px 0;cursor:pointer;border-radius:10px}
 .tabbar button svg{width:24px;height:24px;fill:currentColor}
@@ -209,7 +210,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   </section>
   <section class="card">
     <h2>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">4</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">5</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%">Оновити додаток</button>
   </section>
 </main>
@@ -468,7 +469,10 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     document.addEventListener("touchstart",e=>{if(window.scrollY<=0&&e.touches.length===1){y0=e.touches[0].clientY;pulled=0;}},{passive:true});
     document.addEventListener("touchmove",e=>{if(y0===null)return; pulled=e.touches[0].clientY-y0; if(pulled<10||window.scrollY>0){el.className="ptr";return;}
       const p=Math.min(pulled,TH*1.5); el.querySelector("span").style.transform=`translateY(${p*0.6+40}px)`; el.className="ptr show"+(pulled>TH?" ready":""); txt.textContent=pulled>TH?"Відпусти - оновлюю":"Потягни, щоб оновити";},{passive:true});
-    document.addEventListener("touchend",async()=>{ if(y0!==null&&pulled>TH&&window.scrollY<=0){ txt.textContent="Оновлюю…"; await refreshAll(); } y0=null; el.className="ptr"; el.querySelector("span").style.transform=""; },{passive:true});
+    function reset(){y0=null;pulled=0;el.className="ptr";el.querySelector("span").style.transform="";}
+    document.addEventListener("touchend",async()=>{ if(y0!==null&&pulled>TH&&window.scrollY<=0){ txt.textContent="Оновлюю…"; reset(); await refreshAll(); return; } reset(); },{passive:true});
+    document.addEventListener("touchcancel",reset,{passive:true});
+    window.addEventListener("scroll",()=>{if(window.scrollY>0)reset();},{passive:true});
   })();
   async function refreshAll(){
     try{ if(navigator.serviceWorker){const r=await navigator.serviceWorker.getRegistration(); if(r) await r.update();} }catch(e){}
