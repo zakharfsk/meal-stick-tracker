@@ -151,7 +151,7 @@ h2 .ic{color:var(--muted)}
 .card.status{padding:14px 16px}
 .act{padding:12px 12px} .act .ic.big{width:22px;height:22px;margin-bottom:2px} .act{font-size:1rem}
 .more summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:.95rem;list-style:none;display:flex;align-items:center;justify-content:flex-start;color:var(--muted)}
-.more summary::after{content:none}
+details.more summary::after,details.more[open] summary::after{content:none!important;display:none}
 .more summary .ic{transition:transform .2s ease}
 .more[open] summary .ic{transform:rotate(45deg)}
 .more summary::-webkit-details-marker{display:none}
@@ -599,7 +599,7 @@ h2 .ic{color:var(--muted)}
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">13</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">14</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
