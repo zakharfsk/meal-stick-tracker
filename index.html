@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#edf0f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14191f" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Їжа та стіки">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" href="./icons/icon-192.png">
+<title>Їжа та стіки</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column, status card first, two big action buttons, today's timeline, week, settings */
+:root{
+  --bg:#edf0f4; --card:#ffffff; --fg:#19212c; --muted:#5f6b7a; --line:#d5dbe3;
+  --meal:#2b7a68; --meal-soft:#dff0eb;
+  --stick:#b9651a; --stick-soft:#f7e8d8;
+  --wait:#b53a3a; --wait-soft:#f8e1e1;
+  --display:'Sora',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14191f; --card:#1d242c; --fg:#e8ecf1; --muted:#99a4b2; --line:#303a46;
+  --meal:#5cc2a8; --meal-soft:#1d3a34; --stick:#e3934a; --stick-soft:#3d2b1a;
+  --wait:#e46a6a; --wait-soft:#3f2222; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#14191f; --card:#1d242c; --fg:#e8ecf1; --muted:#99a4b2; --line:#303a46;
+  --meal:#5cc2a8; --meal-soft:#1d3a34; --stick:#e3934a; --stick-soft:#3d2b1a;
+  --wait:#e46a6a; --wait-soft:#3f2222; color-scheme:dark }
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;margin:0}
+.wrap{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:14px 40px;display:grid;gap:14px}
+h1{font-family:var(--display);font-size:1.15rem;font-weight:600;margin:0;display:flex;justify-content:space-between;align-items:baseline}
+h1 small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.status{display:grid;gap:6px}
+.status .label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.status .big{font-family:var(--display);font-size:1.6rem;font-weight:700;line-height:1.15;text-wrap:balance}
+.status .sub{color:var(--muted);font-size:.95rem}
+.status.ok .big{color:var(--meal)} .status.wait .big{color:var(--wait)} .status.limit .big{color:var(--stick)}
+.status .timer{font-variant-numeric:tabular-nums;font-family:var(--display);font-weight:600}
+.counts{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.pill{border-radius:999px;padding:4px 12px;font-size:.85rem;font-weight:500;font-variant-numeric:tabular-nums}
+.pill.meal{background:var(--meal-soft);color:var(--meal)} .pill.stick{background:var(--stick-soft);color:var(--stick)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.act{border:0;border-radius:14px;padding:18px 12px;font-family:var(--display);font-size:1.05rem;font-weight:600;color:#fff;cursor:pointer;display:grid;gap:4px;text-align:left}
+.act small{font-family:var(--body);font-weight:400;font-size:.8rem;opacity:.9}
+.act.meal{background:var(--meal)} .act.stick{background:var(--stick)}
+.act:focus-visible,button:focus-visible,input:focus-visible,details summary:focus-visible{outline:3px solid var(--meal);outline-offset:2px}
+.timerow{display:flex;gap:8px;align-items:center;font-size:.9rem;color:var(--muted);flex-wrap:wrap}
+.timerow input[type=time]{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.timerow button{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--fg);cursor:pointer}
+h2{font-family:var(--display);font-size:.95rem;font-weight:600;margin:0 0 10px}
+.plan{display:flex;gap:6px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.plan span{border:1px dashed var(--line);border-radius:8px;padding:3px 8px;font-variant-numeric:tabular-nums}
+.plan span.done{border-style:solid;color:var(--meal);border-color:var(--meal)}
+.plan span.next{border-style:solid;color:var(--fg);border-color:var(--fg)}
+ul.tl{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tl li{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.tl li .t{font-variant-numeric:tabular-nums;font-weight:600;font-family:var(--display);font-size:.95rem}
+.tl li .k{font-size:.9rem}
+.tl li.meal .t{color:var(--meal)} .tl li.stick .t{color:var(--stick)}
+.tl li button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
+.empty{color:var(--muted);font-size:.9rem}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.week .d{display:grid;gap:4px;font-size:.75rem;color:var(--muted)}
+.week .bar{height:46px;display:flex;align-items:flex-end;justify-content:center}
+.week .bar i{display:block;width:70%;border-radius:4px 4px 0 0;background:var(--stick);min-height:2px}
+.week .bar i.over{background:var(--wait)}
+.week .n{font-variant-numeric:tabular-nums;font-weight:600;color:var(--fg);font-size:.85rem}
+details summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:.95rem;list-style:none;display:flex;justify-content:space-between}
+details summary::after{content:"+";color:var(--muted)} details[open] summary::after{content:"–"}
+.set{display:grid;gap:10px;margin-top:12px}
+.set label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:.9rem}
+.set input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:96px;font-variant-numeric:tabular-nums}
+.set .hint{font-size:.8rem;color:var(--muted)}
+.note{font-size:.8rem;color:var(--muted)}
+.ask{border-color:var(--wait);background:var(--wait-soft)}
+.ask .big{font-family:var(--display);font-weight:700;font-size:1.25rem;color:var(--wait)}
+.askBtns{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+.askBtns button{font:inherit;font-weight:500;padding:12px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.askBtns button.danger{border-color:var(--wait);color:var(--wait)}
+.choose{border-color:var(--meal);background:var(--meal-soft)}
+.choose .big{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--meal);margin-bottom:10px}
+.choose .askBtns button.suggest{border-color:var(--meal);color:var(--meal);font-weight:600}
+.choose .cancel{margin-top:8px;background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;padding:4px 0}
+.filebtn{display:flex;align-items:center;justify-content:center;font-weight:500;padding:12px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Їжа та стіки <small id="dateLabel"></small></h1>
+
+  <section class="card status" id="status" aria-live="polite">
+    <div class="label">Статус</div>
+    <div class="big" id="stBig">Завантаження…</div>
+    <div class="sub" id="stSub"></div>
+    <div class="counts">
+      <span class="pill meal" id="mealCount">Їжа 0/4</span>
+      <span class="pill stick" id="stickCount">Стіки 0/4</span>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="act meal" id="btnMeal">Я поїв <small>записати зараз</small></button>
+    <button class="act stick" id="btnStick">Стік <small>записати зараз</small></button>
+  </div>
+  <section class="card choose" id="choose" hidden>
+    <div class="big">Що це був за прийом? <span class="note" id="chooseTime"></span></div>
+    <div class="askBtns" id="chooseBtns"></div>
+    <button id="chooseCancel" class="cancel">Скасувати</button>
+  </section>
+  <section class="card ask" id="ask" hidden>
+    <div class="big" id="askTitle">Ще рано</div>
+    <p id="askText" style="margin:6px 0 12px"></p>
+    <div class="askBtns">
+      <button id="askNo">Зачекаю</button>
+      <button id="askYes" class="danger">Все одно закурив - записати</button>
+    </div>
+  </section>
+  <div class="timerow">
+    <span>Або інший час:</span>
+    <input type="time" id="customTime" aria-label="Час події">
+    <button id="btnMealAt">+ їжа</button>
+    <button id="btnStickAt">+ стік</button>
+  </div>
+
+  <section class="card">
+    <h2>План їжі</h2>
+    <div class="plan" id="plan"></div>
+    <p class="note" style="margin:10px 0 0">Стік не раніше ніж через 2 год після їжі і не натщесерце.</p>
+  </section>
+
+  <section class="card">
+    <h2>Сьогодні</h2>
+    <ul class="tl" id="timeline"></ul>
+    <p class="empty" id="tlEmpty">Ще нічого не записано. Після їжі натисни «Я поїв».</p>
+  </section>
+
+  <section class="card">
+    <h2>Стіки за тиждень</h2>
+    <div class="week" id="week"></div>
+  </section>
+
+  <details class="card" id="settings">
+    <summary>Налаштування</summary>
+    <div class="set">
+      <label>Прокидаюсь о <input type="time" id="sWake"></label>
+      <label>Прийомів їжі на день <input type="number" id="sMeals" min="3" max="6"></label>
+      <label>Між прийомами їжі, год <input type="number" id="sInterval" min="2" max="6" step="0.5"></label>
+      <label>Пауза після їжі, хв <input type="number" id="sGap" min="60" max="240" step="15"></label>
+      <label>Ціль стіків на день <input type="number" id="sLimit" min="0" max="20"></label>
+      <div class="hint">Базовий план: перший прийом через 30 хв після підйому, далі через вказаний інтервал (остання їжа не пізніше 22:00 - якщо не вміщається, інтервал стискається). Коли відмічаєш сніданок, увесь план зсувається від його реального часу; інші прийоми план не рухають.</div>
+      <button class="timerow" id="sSave" style="justify-self:start;padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--fg);font:inherit;cursor:pointer">Зберегти</button>
+    </div>
+  </details>
+  <section class="card">
+    <h2>Бекап</h2>
+    <p class="note" style="margin:0 0 10px">Дані зберігаються на цьому пристрої. Раз на тиждень зроби експорт - файл можна зберегти в iCloud і відновити з нього.</p>
+    <div class="askBtns">
+      <button id="btnExport">Експорт JSON</button>
+      <label class="filebtn"><input type="file" id="importFile" accept="application/json,.json" hidden>Імпорт JSON</label>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const DEF={wake:"09:30",meals:4,gap:120,limit:4,interval:3.5};
+  let settings={...DEF};
+  let today={meals:[],sticks:[],types:{}};
+  const TYPES=["Сніданок","Обід","Вечеря","Перекус"];
+  let pendingMealMs=null;
+  function mainMeals(){return today.meals.filter(m=>today.types[m]!=="Перекус");}
+  let week={};  // key -> {sticks:n}
+  let db=null, unsubToday=null, saving=false;
+
+  // ---- day key: a day starts at 05:00 so late sticks count for the evening before
+  const DAY_SHIFT=5*60;
+  function dayKey(d=new Date()){const x=new Date(d.getTime()-DAY_SHIFT*60000);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");}
+  function keyDate(k){const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d);}
+  function hm(ms){const d=new Date(ms);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+  function minsOf(t){const [h,m]=t.split(":").map(Number);return h*60+m;}
+  function todayAt(mins){const base=keyDate(dayKey());const d=new Date(base);d.setHours(0,0,0,0);d.setMinutes(mins);return d.getTime();}
+  function fmtDur(ms){const m=Math.max(0,Math.ceil(ms/60000));const h=Math.floor(m/60),mm=m%60;return h?`${h} год ${String(mm).padStart(2,"0")} хв`:`${mm} хв`;}
+
+  // ---- meal plan from wake time
+  // Base plan from wake time; once meals are logged, the rest of the day shifts from the last real meal.
+  function basePlan(){
+    const first=minsOf(settings.wake)+30;
+    const n=settings.meals; let step=(+settings.interval||3.5)*60;
+    const hardLast=22*60;
+    if(n>1&&first+(n-1)*step>hardLast) step=Math.max(90,(hardLast-first)/(n-1));
+    return Array.from({length:n},(_,i)=>Math.round(first+i*step));
+  }
+  function plan(){
+    const base=basePlan(); const n=base.length;
+    const bf=today.meals.find(m=>today.types[m]==="Сніданок");
+    if(bf===undefined) return base;
+    const dayStart=keyDate(dayKey()).setHours(0,0,0,0);
+    const first=Math.round((bf-dayStart)/60000);
+    let step=n>1?base[1]-base[0]:0;
+    const hardLast=22*60; // compress if breakfast was late
+    if(n>1&&first+(n-1)*step>hardLast) step=Math.max(90,(hardLast-first)/(n-1));
+    return Array.from({length:n},(_,i)=>Math.round(first+i*step));
+  }
+
+  // ---- storage: IndexedDB (all days kept), localStorage as a last resort
+  const DBN="meal-stick-tracker", LS="bile-sticks-v1";
+  let idb=null;
+  function openIdb(){return new Promise((res,rej)=>{try{const r=indexedDB.open(DBN,1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore("days");d.createObjectStore("settings");};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});}
+  function tx(store,mode,fn){return new Promise((res,rej)=>{const t=idb.transaction(store,mode);const st=t.objectStore(store);const r=fn(st);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);});}
+  function lsLoad(){try{return JSON.parse(localStorage.getItem(LS)||"{}");}catch(e){return {};}}
+  function lsSave(obj){try{localStorage.setItem(LS,JSON.stringify(obj));}catch(e){}}
+
+  async function saveToday(){
+    const k=dayKey(); const rec={meals:today.meals,sticks:today.sticks,types:today.types};
+    if(idb){try{await tx("days","readwrite",st=>st.put(rec,k));}catch(e){toast("Не вдалося зберегти");}}
+    const all=lsLoad(); all.days=all.days||{}; all.days[k]=rec; lsSave(all);
+    week[k]={sticks:today.sticks.length}; render();
+  }
+  async function saveSettings(){
+    if(idb){try{await tx("settings","readwrite",st=>st.put(settings,"main"));}catch(e){}}
+    const all=lsLoad();all.settings=settings;lsSave(all);
+    render(); toast("Збережено");
+  }
+  async function loadAll(){
+    let days={}, st=null;
+    try{ idb=await openIdb();
+      const keys=await tx("days","readonly",s=>s.getAllKeys()); const vals=await tx("days","readonly",s=>s.getAll());
+      keys.forEach((k,i)=>days[k]=vals[i]); st=await tx("settings","readonly",s=>s.get("main"));
+    }catch(e){ idb=null; }
+    const ls=lsLoad();
+    if(!Object.keys(days).length&&ls.days){days=ls.days; if(idb) for(const k in days) try{await tx("days","readwrite",s=>s.put(days[k],k));}catch(e){}}
+    settings={...DEF,...(st||ls.settings||{})};
+    Object.keys(days).forEach(k=>week[k]={sticks:(days[k].sticks||[]).length});
+    const t=days[dayKey()]; if(t) today={meals:[...(t.meals||[])],sticks:[...(t.sticks||[])],types:{...(t.types||{})}};
+    allDays=days; render();
+    try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  }
+  let allDays={};
+
+  // ---- backup
+  async function exportJson(){
+    let days=allDays; if(idb){try{const keys=await tx("days","readonly",s=>s.getAllKeys());const vals=await tx("days","readonly",s=>s.getAll());days={};keys.forEach((k,i)=>days[k]=vals[i]);}catch(e){}}
+    const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),settings,days},null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="meal-stick-backup-"+dayKey()+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+  }
+  async function importJson(file){
+    try{const obj=JSON.parse(await file.text()); if(!obj.days) throw 0;
+      for(const k in obj.days){ if(idb) await tx("days","readwrite",s=>s.put(obj.days[k],k)); }
+      const all=lsLoad(); all.days={...(all.days||{}),...obj.days}; if(obj.settings) all.settings=obj.settings; lsSave(all);
+      if(obj.settings){settings={...DEF,...obj.settings}; if(idb) await tx("settings","readwrite",s=>s.put(settings,"main"));}
+      await loadAll(); toast("Імпортовано "+Object.keys(obj.days).length+" днів");
+    }catch(e){toast("Файл не схожий на бекап");}
+  }
+
+  // ---- actions
+  function addEvent(kind,ms,type){
+    const arr=kind==="meal"?today.meals:today.sticks;
+    arr.push(ms); arr.sort((a,b)=>a-b);
+    if(kind==="meal"&&type) today.types[ms]=type;
+    if(kind==="stick"&&today.sticks.length>settings.limit) toast(`Це ${today.sticks.length}-й стік, ціль ${settings.limit}`);
+    saveToday();
+  }
+  function removeEvent(kind,ms){
+    const arr=kind==="meal"?today.meals:today.sticks;
+    const i=arr.indexOf(ms); if(i>=0)arr.splice(i,1); delete today.types[ms]; saveToday();
+  }
+  function customMs(){const v=$("customTime").value;if(!v)return null;return todayAt(minsOf(v)<DAY_SHIFT?minsOf(v)+24*60:minsOf(v));}
+
+  $("btnMeal").onclick=()=>openChooser(Date.now());
+  $("btnStick").onclick=()=>{
+    const s=statusNow();
+    if(s.cls==="ok"){addEvent("stick",Date.now());toast("Записано. Наступний не раніше ніж через 2 год після їжі.");return;}
+    $("askTitle").innerHTML=s.cls==="wait"?"Ще рано":"Ціль уже вичерпана";
+    $("askText").textContent=s.sub;
+    $("ask").hidden=false; $("askNo").focus();
+  };
+  $("askNo").onclick=()=>{$("ask").hidden=true;};
+  $("askYes").onclick=()=>{$("ask").hidden=true;addEvent("stick",Date.now());};
+  $("btnMealAt").onclick=()=>{const m=customMs();if(m)openChooser(m);else toast("Вкажи час");};
+  function openChooser(ms){
+    pendingMealMs=ms; $("ask").hidden=true;
+    const n=mainMeals().length, total=settings.meals;
+    const suggest=n===0?"Сніданок":n>=total-1?"Вечеря":"Обід";
+    $("chooseTime").textContent=hm(ms);
+    $("chooseBtns").innerHTML=TYPES.map(t=>`<button data-t="${t}" class="${t===suggest?"suggest":""}">${t}</button>`).join("");
+    $("chooseBtns").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("choose").hidden=true;addEvent("meal",pendingMealMs,b.dataset.t);});
+    $("choose").hidden=false;
+  }
+  $("chooseCancel").onclick=()=>{$("choose").hidden=true;};
+  $("btnStickAt").onclick=()=>{const m=customMs();if(m)addEvent("stick",m);else toast("Вкажи час");};
+  $("sSave").onclick=()=>{
+    settings={wake:$("sWake").value||DEF.wake,meals:+$("sMeals").value||DEF.meals,gap:+$("sGap").value||DEF.gap,limit:Math.max(0,+$("sLimit").value),interval:+$("sInterval").value||DEF.interval};
+    saveSettings();
+  };
+
+  // ---- render
+  function statusNow(){
+    const now=Date.now();
+    const lastMeal=today.meals.length?today.meals[today.meals.length-1]:null;
+    const plans=plan().map(todayAt);
+    const nextPlan=plans.find(p=>p>now);
+    if(!lastMeal) return {cls:"wait",big:"Спочатку поїж",sub:nextPlan?`Стік натщесерце не варто. Перший прийом їжі за планом о ${hm(nextPlan)}.`:"Стік натщесерце не варто."};
+    const okAt=lastMeal+settings.gap*60000;
+    if(now<okAt) return {cls:"wait",big:`Зачекай ще <span class="timer">${fmtDur(okAt-now)}</span>`,sub:`Поїв о ${hm(lastMeal)}, міхур ще спорожнюється. Можна з ${hm(okAt)}.`};
+    if(today.sticks.length>=settings.limit&&settings.limit>0) return {cls:"limit",big:"Ціль на сьогодні вичерпана",sub:`Уже ${today.sticks.length} з ${settings.limit}. Кожен наступний - понад план.`};
+    let sub=`Після їжі о ${hm(lastMeal)} минуло ${fmtDur(now-lastMeal)}.`;
+    if(nextPlan&&nextPlan-now<45*60000) sub+=` Наступна їжа о ${hm(nextPlan)} - встигни до неї.`;
+    return {cls:"ok",big:"Можна стік",sub};
+  }
+  function render(){
+    const s=statusNow(); const st=$("status"); st.className="card status "+s.cls;
+    $("stBig").innerHTML=s.big; $("stSub").textContent=s.sub;
+    $("mealCount").textContent=`Їжа ${mainMeals().length}/${settings.meals}`;
+    $("stickCount").textContent=`Стіки ${today.sticks.length}/${settings.limit}`;
+    $("dateLabel").textContent=keyDate(dayKey()).toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"});
+
+    const now=Date.now(); const pl=plan(); let nextMarked=false;
+    $("plan").innerHTML=pl.map((m,i)=>{
+      const done=i<mainMeals().length; let cls=done?"done":"";
+      if(!done&&!nextMarked&&todayAt(m)>now-60*60000){cls="next";nextMarked=true;}
+      return `<span class="${cls}">${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</span>`;
+    }).join("");
+
+    const ev=[...today.meals.map(t=>({k:"meal",t})),...today.sticks.map(t=>({k:"stick",t}))].sort((a,b)=>a.t-b.t);
+    $("tlEmpty").hidden=ev.length>0;
+    $("timeline").innerHTML=ev.map(e=>{
+      let note=""; if(e.k==="stick"){const prev=[...today.meals].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)} після їжі`:"натщесерце";}
+      else{note="";}
+      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k">${e.k==="meal"?(today.types[e.t]||"Їжа"):"Стік"} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити">×</button></li>`;
+    }).join("");
+    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>removeEvent(b.dataset.k,+b.dataset.t));
+
+    const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(dayKey(d));}
+    const max=Math.max(settings.limit,...days.map(k=>(week[k]||{sticks:0}).sticks),1);
+    $("week").innerHTML=days.map(k=>{const n=(week[k]||{sticks:0}).sticks;const h=Math.round(n/max*44);const over=settings.limit>0&&n>settings.limit;
+      return `<div class="d"><div class="bar"><i class="${over?"over":""}" style="height:${h}px"></i></div><div class="n">${n}</div><div>${keyDate(k).toLocaleDateString("uk-UA",{weekday:"short"})}</div></div>`;}).join("");
+
+    if(document.activeElement!==$("sWake")){$("sWake").value=settings.wake;$("sMeals").value=settings.meals;$("sGap").value=settings.gap;$("sInterval").value=settings.interval;$("sLimit").value=settings.limit;}
+  }
+  let toastT; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
+
+  // ---- boot
+  render(); setInterval(render,30000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
+  loadAll();
+  $("btnExport").onclick=exportJson;
+  $("importFile").onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value="";};
+  if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+})();
+</script>
+</body>
+</html>
