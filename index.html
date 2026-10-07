@@ -145,6 +145,15 @@ h2 .ic{color:var(--muted)}
 .tl li button{display:flex;align-items:center} .tl li button .ic{margin:0}
 .sleep div span{display:flex;align-items:center}
 .timerow button,.askBtns button,.filebtn{display:inline-flex;align-items:center;justify-content:center}
+.plan.compact{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.plan.compact span{font-size:.8rem;padding:2px 7px}
+.status .big{font-size:1.35rem}
+.card.status{padding:14px 16px}
+.act{padding:12px 12px} .act .ic.big{width:22px;height:22px;margin-bottom:2px} .act{font-size:1rem}
+.more summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:.95rem;list-style:none;display:flex;align-items:center;color:var(--muted)}
+.more summary::-webkit-details-marker{display:none}
+.more[open] summary{color:var(--fg);margin-bottom:12px}
+.moreBody{display:grid;gap:12px}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -480,6 +489,7 @@ h2 .ic{color:var(--muted)}
       <span class="pill meal" id="mealCount">Їжа 0/4</span>
       <span class="pill stick" id="stickCount">Стіки 0/4</span>
     </div>
+    <div class="plan compact" id="plan"></div>
   </section>
   <div class="actions">
     <button class="act meal" id="btnMeal"><svg class="ic big"><use href="#i-meal"/></svg><span>Я поїв <small>записати зараз</small></span></button>
@@ -498,30 +508,27 @@ h2 .ic{color:var(--muted)}
       <button id="askYes" class="danger">Все одно закурив - записати</button>
     </div>
   </section>
+  <section class="card">
+    <h2><svg class="ic"><use href="#i-list"/></svg>Сьогодні</h2>
+    <ul class="tl" id="timeline"></ul>
+    <p class="empty" id="tlEmpty">Ще нічого не записано. Після їжі натисни «Я поїв».</p>
+  </section>
+  <details class="card more" id="more">
+    <summary><svg class="ic"><use href="#i-plus"/></svg>Інший час, сон</summary>
+    <div class="moreBody">
   <div class="timerow">
     <span>Або інший час:</span>
     <input type="time" id="customTime" aria-label="Час події">
     <button id="btnMealAt"><svg class="ic sm"><use href="#i-plus"/></svg>їжа</button>
     <button id="btnStickAt"><svg class="ic sm"><use href="#i-plus"/></svg>стік</button>
   </div>
-  <section class="card">
-    <h2><svg class="ic"><use href="#i-bed"/></svg>Сон</h2>
-    <div class="sleep">
-      <div><span><svg class="ic sm"><use href="#i-sunrise"/></svg>Прокинувся</span><input type="time" id="wakeIn" aria-label="Час підйому"><button data-w="wake">Зараз</button></div>
-      <div><span><svg class="ic sm"><use href="#i-moon"/></svg>Ліг спати</span><input type="time" id="sleepIn" aria-label="Час відбою"><button data-w="sleep">Зараз</button></div>
+      <div class="sleep">
+        <div><span><svg class="ic sm"><use href="#i-sunrise"/></svg>Прокинувся</span><input type="time" id="wakeIn" aria-label="Час підйому"><button data-w="wake">Зараз</button></div>
+        <div><span><svg class="ic sm"><use href="#i-moon"/></svg>Ліг спати</span><input type="time" id="sleepIn" aria-label="Час відбою"><button data-w="sleep">Зараз</button></div>
+      </div>
+      <p class="note" id="sleepNote" style="margin:0"></p>
     </div>
-    <p class="note" id="sleepNote" style="margin:8px 0 0"></p>
-  </section>
-  <section class="card">
-    <h2><svg class="ic"><use href="#i-clock"/></svg>План їжі</h2>
-    <div class="plan" id="plan"></div>
-    <p class="note" style="margin:10px 0 0">Стік не раніше ніж через 2 год після їжі і не натщесерце.</p>
-  </section>
-  <section class="card">
-    <h2><svg class="ic"><use href="#i-list"/></svg>Сьогодні</h2>
-    <ul class="tl" id="timeline"></ul>
-    <p class="empty" id="tlEmpty">Ще нічого не записано. Після їжі натисни «Я поїв».</p>
-  </section>
+  </details>
 </main>
 
 <main class="tab" id="tab-history" hidden>
@@ -558,7 +565,7 @@ h2 .ic{color:var(--muted)}
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">9</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">10</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
