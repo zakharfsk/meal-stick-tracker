@@ -31,7 +31,7 @@
   --meal:#5cc2a8; --meal-soft:#1d3a34; --stick:#e3934a; --stick-soft:#3d2b1a;
   --wait:#e46a6a; --wait-soft:#3f2222; color-scheme:dark }
 *{box-sizing:border-box}
-html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overscroll-behavior-y:none}
 img{max-width:100%}[hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;margin:0}
 .wrap{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:14px 40px;display:grid;gap:14px}
@@ -117,6 +117,10 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .days .sub div{display:grid;grid-template-columns:52px 1fr;gap:8px}
 .days .sub .t{font-variant-numeric:tabular-nums;font-weight:600}
 .days .sub .meal .t{color:var(--meal)} .days .sub .stick .t{color:var(--stick)}
+.ptr{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;justify-content:center;pointer-events:none;z-index:6}
+.ptr span{margin-top:-40px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 14px;font-size:.85rem;transition:transform .15s,opacity .15s;opacity:0}
+.ptr.show span{opacity:1} .ptr.ready span{color:var(--meal);border-color:var(--meal)}
+@media (prefers-reduced-motion:reduce){.ptr span{transition:none}}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -210,6 +214,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   <button data-tab="history"><svg viewBox="0 0 24 24"><path d="M4 20h16v-2H4zm2-4h3V9H6zm5 0h3V4h-3zm5 0h3v-7h-3z"/></svg>Історія</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.6 3-2.1-.4a6.6 6.6 0 0 0-.6-1.5l1.2-1.8-2.4-2.4-1.8 1.2a6.6 6.6 0 0 0-1.5-.6L13 3h-2l-.4 2.1a6.6 6.6 0 0 0-1.5.6L7.3 4.5 4.9 6.9l1.2 1.8a6.6 6.6 0 0 0-.6 1.5L3.4 11v2l2.1.4c.1.5.4 1 .6 1.5l-1.2 1.8 2.4 2.4 1.8-1.2c.5.3 1 .5 1.5.6L11 21h2l.4-2.1c.5-.1 1-.4 1.5-.6l1.8 1.2 2.4-2.4-1.2-1.8c.3-.5.5-1 .6-1.5l2.1-.4z"/></svg>Налашт.</button>
 </nav>
+<div class="ptr" id="ptr"><span id="ptrText">Потягни, щоб оновити</span></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -449,6 +454,21 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
       return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${sub}</li>`;
     }).join("");
     $("histList").querySelectorAll(".row").forEach(r=>r.onclick=()=>{openDay=openDay===r.dataset.k?null:r.dataset.k;renderHistory();});
+  }
+
+
+  // ---- pull to refresh (standalone PWA has no native one)
+  (function(){
+    const el=$("ptr"), txt=$("ptrText"); let y0=null, pulled=0; const TH=80;
+    document.addEventListener("touchstart",e=>{if(window.scrollY<=0&&e.touches.length===1){y0=e.touches[0].clientY;pulled=0;}},{passive:true});
+    document.addEventListener("touchmove",e=>{if(y0===null)return; pulled=e.touches[0].clientY-y0; if(pulled<10||window.scrollY>0){el.className="ptr";return;}
+      const p=Math.min(pulled,TH*1.5); el.querySelector("span").style.transform=`translateY(${p*0.6+40}px)`; el.className="ptr show"+(pulled>TH?" ready":""); txt.textContent=pulled>TH?"Відпусти - оновлюю":"Потягни, щоб оновити";},{passive:true});
+    document.addEventListener("touchend",async()=>{ if(y0!==null&&pulled>TH&&window.scrollY<=0){ txt.textContent="Оновлюю…"; await refreshAll(); } y0=null; el.className="ptr"; el.querySelector("span").style.transform=""; },{passive:true});
+  })();
+  async function refreshAll(){
+    try{ if(navigator.serviceWorker){const r=await navigator.serviceWorker.getRegistration(); if(r) await r.update();} }catch(e){}
+    try{ await loadAll(); }catch(e){}
+    location.reload();
   }
 
   // ---- boot
