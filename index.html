@@ -126,6 +126,11 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .ptr span{margin-top:-40px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 14px;font-size:.85rem;transition:transform .15s,opacity .15s;opacity:0}
 .ptr.show span{opacity:1} .ptr.ready span{color:var(--meal);border-color:var(--meal)}
 @media (prefers-reduced-motion:reduce){.ptr span{transition:none}}
+.sleep{display:grid;gap:8px}
+.sleep div{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:.9rem}
+.sleep input[type=time]{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.sleep button{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--fg);cursor:pointer}
+.tl li.wake .t,.tl li.sleep .t{color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -167,6 +172,14 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     <button id="btnMealAt">+ їжа</button>
     <button id="btnStickAt">+ стік</button>
   </div>
+  <section class="card">
+    <h2>Сон</h2>
+    <div class="sleep">
+      <div><span>Прокинувся</span><input type="time" id="wakeIn" aria-label="Час підйому"><button data-w="wake">Зараз</button></div>
+      <div><span>Ліг спати</span><input type="time" id="sleepIn" aria-label="Час відбою"><button data-w="sleep">Зараз</button></div>
+    </div>
+    <p class="note" id="sleepNote" style="margin:8px 0 0"></p>
+  </section>
   <section class="card">
     <h2>План їжі</h2>
     <div class="plan" id="plan"></div>
@@ -213,7 +226,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   </section>
   <section class="card">
     <h2>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">6</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">7</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%">Оновити додаток</button>
   </section>
 </main>
@@ -231,7 +244,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   const $=id=>document.getElementById(id);
   const DEF={wake:"09:30",meals:4,gap:120,limit:4,interval:3.5};
   let settings={...DEF};
-  let today={meals:[],sticks:[],types:{}};
+  let today={meals:[],sticks:[],types:{},wake:null,sleep:null};
   const TYPES=["Сніданок","Обід","Вечеря","Перекус"];
   let pendingMealMs=null;
   function mainMeals(){return today.meals.filter(m=>today.types[m]!=="Перекус");}
@@ -250,7 +263,8 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   // ---- meal plan from wake time
   // Base plan from wake time; once meals are logged, the rest of the day shifts from the last real meal.
   function basePlan(){
-    const first=minsOf(settings.wake)+30;
+    const dayStart0=keyDate(dayKey()).setHours(0,0,0,0);
+    const first=(today.wake?Math.round((today.wake-dayStart0)/60000):minsOf(settings.wake))+30;
     const n=settings.meals; let step=(+settings.interval||3.5)*60;
     const hardLast=22*60;
     if(n>1&&first+(n-1)*step>hardLast) step=Math.max(90,(hardLast-first)/(n-1));
@@ -277,7 +291,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   function lsSave(obj){try{localStorage.setItem(LS,JSON.stringify(obj));}catch(e){}}
 
   async function saveToday(){
-    const k=dayKey(); const rec={meals:today.meals,sticks:today.sticks,types:today.types};
+    const k=dayKey(); const rec={meals:today.meals,sticks:today.sticks,types:today.types,wake:today.wake||null,sleep:today.sleep||null};
     if(idb){try{await tx("days","readwrite",st=>st.put(rec,k));}catch(e){toast("Не вдалося зберегти");}}
     const all=lsLoad(); all.days=all.days||{}; all.days[k]=rec; lsSave(all);
     week[k]={sticks:today.sticks.length}; allDays[k]=rec; render();
@@ -297,7 +311,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     if(!Object.keys(days).length&&ls.days){days=ls.days; if(idb) for(const k in days) try{await tx("days","readwrite",s=>s.put(days[k],k));}catch(e){}}
     settings={...DEF,...(st||ls.settings||{})};
     Object.keys(days).forEach(k=>week[k]={sticks:(days[k].sticks||[]).length});
-    const t=days[dayKey()]; if(t) today={meals:[...(t.meals||[])],sticks:[...(t.sticks||[])],types:{...(t.types||{})}};
+    const t=days[dayKey()]; if(t) today={meals:[...(t.meals||[])],sticks:[...(t.sticks||[])],types:{...(t.types||{})},wake:t.wake||null,sleep:t.sleep||null};
     allDays=days; render();
     try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
   }
@@ -354,6 +368,12 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   }
   $("chooseCancel").onclick=()=>{$("choose").hidden=true;};
   $("btnStickAt").onclick=()=>{const m=customMs();if(m)addEvent("stick",m);else toast("Вкажи час");};
+  function setSleepEv(kind,ms){today[kind]=ms;saveToday();toast(kind==="wake"?"Підйом записано":"Добраніч");}
+  document.querySelectorAll(".sleep button").forEach(b=>b.onclick=()=>setSleepEv(b.dataset.w,Date.now()));
+  $("wakeIn").onchange=e=>{const v=e.target.value;if(!v)return;setSleepEv("wake",todayAt(minsOf(v)<DAY_SHIFT?minsOf(v)+24*60:minsOf(v)));};
+  $("sleepIn").onchange=e=>{const v=e.target.value;if(!v)return;setSleepEv("sleep",todayAt(minsOf(v)<DAY_SHIFT?minsOf(v)+24*60:minsOf(v)));};
+  function prevKey(k){const d=keyDate(k);d.setDate(d.getDate()-1);return dayKey(new Date(d.getTime()+DAY_SHIFT*60000+60000));}
+  function sleepHours(k,rec){const pr=allDays[prevKey(k)];if(!pr||!pr.sleep||!rec.wake)return null;const h=(rec.wake-pr.sleep)/3600000;return h>0&&h<20?h:null;}
   $("sSave").onclick=()=>{
     settings={wake:$("sWake").value||DEF.wake,meals:+$("sMeals").value||DEF.meals,gap:Math.round((+$("sGapH").value||DEF.gap/60)*60),limit:Math.max(0,+$("sLimit").value),interval:+$("sInterval").value||DEF.interval};
     saveSettings();
@@ -387,14 +407,18 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
       return `<span class="${cls}">${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</span>`;
     }).join("");
 
-    const ev=[...today.meals.map(t=>({k:"meal",t})),...today.sticks.map(t=>({k:"stick",t}))].sort((a,b)=>a.t-b.t);
+    if(document.activeElement!==$("wakeIn"))$("wakeIn").value=today.wake?hm(today.wake):"";
+    if(document.activeElement!==$("sleepIn"))$("sleepIn").value=today.sleep?hm(today.sleep):"";
+    {const sh=sleepHours(dayKey(),today);$("sleepNote").textContent=sh?`Спав ${sh.toFixed(1)} год.`+(today.wake?"":""):(today.wake?"Підйом записаний - план їжі рахується від нього.":"Відміть підйом - план їжі зсунеться від реального часу.");}
+    const ev=[...today.meals.map(t=>({k:"meal",t})),...today.sticks.map(t=>({k:"stick",t})),...(today.wake?[{k:"wake",t:today.wake}]:[]),...(today.sleep?[{k:"sleep",t:today.sleep}]:[])].sort((a,b)=>a.t-b.t);
     $("tlEmpty").hidden=ev.length>0;
     $("timeline").innerHTML=ev.map(e=>{
       let note=""; if(e.k==="stick"){const prev=[...today.meals].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)} після їжі`:"натщесерце";}
       else{note="";}
-      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k">${e.k==="meal"?(today.types[e.t]||"Їжа"):"Стік"} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити">×</button></li>`;
+      const label=e.k==="meal"?(today.types[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон";
+      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k">${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити">×</button></li>`;
     }).join("");
-    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>removeEvent(b.dataset.k,+b.dataset.t));
+    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);});
 
     renderHistory();
 
@@ -439,13 +463,21 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     const gapsAll=st.filter(x=>x.avgGap!==null); const avgGap=gapsAll.length?gapsAll.reduce((a,x)=>a+x.avgGap,0)/gapsAll.length:null;
     const early=st.reduce((a,x)=>a+x.early+x.fasting,0); const mealsAvg=st.reduce((a,x)=>a+x.meals,0)/n;
     const maxDay=Math.max(0,...st.map(x=>x.sticks));
+    const periodKeys=period==="day"?[dayKey()]:chartKeys;
+    const sleeps=periodKeys.map(k=>allDays[k]?sleepHours(k,allDays[k]):null).filter(x=>x!==null);
+    const avgSleep=sleeps.length?sleeps.reduce((a,b)=>a+b,0)/sleeps.length:null;
+    const wakes=periodKeys.map(k=>allDays[k]&&allDays[k].wake?Math.round((allDays[k].wake-keyDate(k).setHours(0,0,0,0))/60000):null).filter(x=>x!==null);
+    const avgWake=wakes.length?Math.round(wakes.reduce((a,b)=>a+b,0)/wakes.length):null;
+    const wakeStr=avgWake!==null?`${String(Math.floor(avgWake/60)%24).padStart(2,"0")}:${String(avgWake%60).padStart(2,"0")}`:"–";
     if(period==="day"){
       $("histStats").innerHTML=tile(total,"стіків сьогодні",total>settings.limit?"bad":"stick")+tile(st[0].meals+(st[0].snacks?`<small style="font-size:.9rem;color:var(--muted)"> +${st[0].snacks}</small>`:""),"прийомів їжі","meal")
-        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(early,"стіків зарано / натщесерце",early?"bad":"");
+        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(early,"стіків зарано / натщесерце",early?"bad":"")
+        +tile(avgSleep!==null?avgSleep.toFixed(1)+" год":"–","сон",avgSleep!==null&&avgSleep<7?"bad":"")+tile(wakeStr,"підйом");
     }else{
       $("histStats").innerHTML=tile(total,"стіків усього","stick")+tile((total/n).toFixed(1),"в середньому за день",total/n>settings.limit?"bad":"stick")
         +tile(`${within}/${n}`,"днів у межах цілі",within<n?"":"meal")+tile(maxDay,"максимум за день",maxDay>settings.limit?"bad":"")
-        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(mealsAvg.toFixed(1),"прийомів їжі на день","meal");
+        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(mealsAvg.toFixed(1),"прийомів їжі на день","meal")
+        +tile(avgSleep!==null?avgSleep.toFixed(1)+" год":"–","сон у середньому",avgSleep!==null&&avgSleep<7?"bad":"")+tile(wakeStr,"середній підйом");
     }
     // chart
     $("histChartTitle").textContent=title; const w=$("histChart"); w.className="week"+(period==="month"?" m":"");
@@ -460,7 +492,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
       const ev=[...r.meals.map(t=>({k:"meal",t})),...r.sticks.map(t=>({k:"stick",t}))].sort((a,b)=>a.t-b.t);
       const sub=isOpen?`<div class="sub">${ev.map(e=>{let note="";if(e.k==="stick"){const prev=[...r.meals].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)}`:"натщесерце";}
         return `<div class="${e.k}"><span class="t">${hm(e.t)}</span><span>${e.k==="meal"?((r.types||{})[e.t]||"Їжа"):"Стік"} <span class="note">${note}</span></span></div>`;}).join("")||"<span class=note>порожньо</span>"}</div>`:"";
-      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${sub}</li>`;
+      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${(()=>{const sh=sleepHours(k,r);const w=r.wake?hm(r.wake):null;return (sh||w)?`<div class="note" style="margin-top:4px">${w?"підйом "+w:""}${w&&sh?" · ":""}${sh?"сон "+sh.toFixed(1)+" год":""}</div>`:"";})()}${sub}</li>`;
     }).join("");
     $("histList").querySelectorAll(".row").forEach(r=>r.onclick=()=>{openDay=openDay===r.dataset.k?null:r.dataset.k;renderHistory();});
   }
