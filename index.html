@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Їжа та стіки">
+<meta http-equiv="Cache-Control" content="no-cache">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" href="./icons/icon-192.png">
@@ -206,7 +207,11 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
       <label class="filebtn"><input type="file" id="importFile" accept="application/json,.json" hidden>Імпорт JSON</label>
     </div>
   </section>
-  <p class="note">Версія 2 · дані лише на цьому пристрої</p>
+  <section class="card">
+    <h2>Оновлення</h2>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">4</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <button id="btnUpdate" class="filebtn" style="width:100%">Оновити додаток</button>
+  </section>
 </main>
 </div>
 <nav class="tabbar" aria-label="Розділи">
@@ -477,7 +482,16 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   loadAll();
   $("btnExport").onclick=exportJson;
   $("importFile").onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value="";};
-  if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+  if("serviceWorker" in navigator){
+    let reloading=false;
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloading)return;reloading=true;location.reload();});
+    window.addEventListener("load",async()=>{try{const r=await navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"});
+      const check=()=>r.update().catch(()=>{}); check(); setInterval(check,15*60000);
+      document.addEventListener("visibilitychange",()=>{if(!document.hidden)check();});
+      r.addEventListener("updatefound",()=>{const w=r.installing;if(!w)return;w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller){w.postMessage("skipWaiting");}});});
+    }catch(e){}});
+  }
+  $("btnUpdate").onclick=()=>refreshAll();
 })();
 </script>
 </body>
