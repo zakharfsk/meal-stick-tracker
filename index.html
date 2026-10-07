@@ -190,7 +190,8 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .plan span{transition:border-color .2s,color .2s}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
-.grp{margin:4px 0 0;color:var(--muted);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.tab>section:not(.card){display:grid;gap:10px;margin-top:6px}
+.grp{margin:0;color:var(--muted);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
 .grp .ic{width:16px;height:16px}
 .tile .v small{font-size:.85rem;color:var(--muted);font-weight:500;margin-left:4px}
 .tile .d{font-size:.75rem;margin-top:4px;font-weight:500;display:flex;align-items:center;gap:4px}
@@ -288,7 +289,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </div>
   <p class="empty" id="histEmpty">Ще немає записів.</p>
   <section class="card report" id="report" hidden><h2><svg class="ic"><use href="#i-sparkles"/></svg><span id="reportTitle">Підсумок</span></h2><div id="reportBody"></div></section>
-  <section id="grpSticks"><h2 class="grp"><svg class="ic"><use href="#i-stick"/></svg>Стіки</h2><p class="note" id="trendNote" style="margin:0 0 8px"></p><div class="tiles" id="tilesSticks"></div></section>
+  <section id="grpSticks"><h2 class="grp"><svg class="ic"><use href="#i-stick"/></svg>Стіки</h2><p class="note" id="trendNote" style="margin:-6px 0 0"></p><div class="tiles" id="tilesSticks"></div></section>
   <section class="card" id="histChartCard"><h2><svg class="ic"><use href="#i-chart"/></svg><span id="histChartTitle">Стіки по днях</span></h2><div class="week" id="histChart"></div></section>
   <section class="card"><h2><svg class="ic"><use href="#i-clock"/></svg>Коли курю</h2><div class="hours" id="hours"></div></section>
   <section id="grpFood"><h2 class="grp"><svg class="ic"><use href="#i-meal"/></svg>Їжа та жовчний</h2><div class="tiles" id="tilesFood"></div></section>
@@ -321,7 +322,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">18</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">19</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
