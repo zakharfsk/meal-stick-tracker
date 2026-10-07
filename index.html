@@ -77,7 +77,10 @@ ul.tl{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 details summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:.95rem;list-style:none;display:flex;justify-content:space-between}
 details summary::after{content:"+";color:var(--muted)} details[open] summary::after{content:"–"}
 .set{display:grid;gap:10px;margin-top:12px}
-.set label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:.9rem}
+.set label{display:grid;grid-template-columns:1fr auto;align-items:start;gap:12px;font-size:.9rem;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.set label:last-of-type{border-bottom:0}
+.set .lt{display:grid;gap:3px;font-weight:500}
+.set .lt small{font-weight:400;font-size:.78rem;color:var(--muted);line-height:1.35}
 .set input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:96px;font-variant-numeric:tabular-nums}
 .set .hint{font-size:.8rem;color:var(--muted)}
 .note{font-size:.8rem;color:var(--muted)}
@@ -191,12 +194,12 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   <section class="card">
     <h2>План і ліміти</h2>
     <div class="set">
-      <label>Прокидаюсь о <input type="time" id="sWake"></label>
-      <label>Прийомів їжі на день <input type="number" id="sMeals" min="3" max="6"></label>
-      <label>Між прийомами їжі, год <input type="number" id="sInterval" min="2" max="6" step="0.5"></label>
-      <label>Пауза після їжі, хв <input type="number" id="sGap" min="60" max="240" step="15"></label>
-      <label>Ціль стіків на день <input type="number" id="sLimit" min="0" max="20"></label>
-      <div class="hint">Базовий план: перший прийом через 30 хв після підйому, далі через вказаний інтервал (остання їжа не пізніше 22:00 - якщо не вміщається, інтервал стискається). Коли відмічаєш сніданок, увесь план зсувається від його реального часу; інші прийоми план не рухають.</div>
+      <label><span class="lt">Прокидаюсь о<small>Від цього часу будується базовий план: перший прийом їжі через 30 хв після підйому.</small></span><input type="time" id="sWake"></label>
+      <label><span class="lt">Прийомів їжі на день<small>Скільки основних прийомів у плані (сніданок, обід, вечеря...). Перекуси сюди не входять.</small></span><input type="number" id="sMeals" min="3" max="6"></label>
+      <label><span class="lt">Між прийомами їжі, год<small>Крок між прийомами в плані. Остання їжа не пізніше 22:00 - якщо не вміщається, крок стискається.</small></span><input type="number" id="sInterval" min="2" max="6" step="0.5"></label>
+      <label><span class="lt">Пауза після їжі, год<small>Скільки чекати після будь-якої їжі (і перекусу), перш ніж можна стік. Поки пауза не минула, кнопка «Стік» попереджає.</small></span><input type="number" id="sGapH" min="1" max="4" step="0.5"></label>
+      <label><span class="lt">Ціль стіків на день<small>Після цієї кількості статус показує «ціль вичерпана», а дні понад ціль в історії підсвічуються червоним. 0 - без ліміту.</small></span><input type="number" id="sLimit" min="0" max="20"></label>
+      <div class="hint">Коли відмічаєш сніданок, увесь план зсувається від його реального часу; інші прийоми план не рухають.</div>
       <button class="timerow" id="sSave" style="justify-self:start;padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--fg);font:inherit;cursor:pointer">Зберегти</button>
     </div>
   </section>
@@ -210,7 +213,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   </section>
   <section class="card">
     <h2>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">5</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">6</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%">Оновити додаток</button>
   </section>
 </main>
@@ -352,7 +355,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   $("chooseCancel").onclick=()=>{$("choose").hidden=true;};
   $("btnStickAt").onclick=()=>{const m=customMs();if(m)addEvent("stick",m);else toast("Вкажи час");};
   $("sSave").onclick=()=>{
-    settings={wake:$("sWake").value||DEF.wake,meals:+$("sMeals").value||DEF.meals,gap:+$("sGap").value||DEF.gap,limit:Math.max(0,+$("sLimit").value),interval:+$("sInterval").value||DEF.interval};
+    settings={wake:$("sWake").value||DEF.wake,meals:+$("sMeals").value||DEF.meals,gap:Math.round((+$("sGapH").value||DEF.gap/60)*60),limit:Math.max(0,+$("sLimit").value),interval:+$("sInterval").value||DEF.interval};
     saveSettings();
   };
 
@@ -395,7 +398,7 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 
     renderHistory();
 
-    if(document.activeElement!==$("sWake")){$("sWake").value=settings.wake;$("sMeals").value=settings.meals;$("sGap").value=settings.gap;$("sInterval").value=settings.interval;$("sLimit").value=settings.limit;}
+    if(document.activeElement!==$("sWake")){$("sWake").value=settings.wake;$("sMeals").value=settings.meals;$("sGapH").value=settings.gap/60;$("sInterval").value=settings.interval;$("sLimit").value=settings.limit;}
   }
   let toastT; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
 
