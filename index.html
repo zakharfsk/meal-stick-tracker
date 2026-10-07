@@ -49,7 +49,8 @@ h1 small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.8
 .pill{border-radius:999px;padding:4px 12px;font-size:.85rem;font-weight:500;font-variant-numeric:tabular-nums}
 .pill.meal{background:var(--meal-soft);color:var(--meal)} .pill.stick{background:var(--stick-soft);color:var(--stick)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.act{border:0;border-radius:14px;padding:18px 12px;font-family:var(--display);font-size:1.05rem;font-weight:600;color:#fff;cursor:pointer;display:grid;gap:4px;text-align:left}
+.act{border:0;border-radius:14px;padding:16px 12px;font-family:var(--display);font-size:1.05rem;font-weight:600;color:#fff;cursor:pointer;text-align:left}
+.act>span{display:grid;gap:2px}
 .act small{font-family:var(--body);font-weight:400;font-size:.8rem;opacity:.9}
 .act.meal{background:var(--meal)} .act.stick{background:var(--stick)}
 .act:focus-visible,button:focus-visible,input:focus-visible,details summary:focus-visible{outline:3px solid var(--meal);outline-offset:2px}
@@ -131,17 +132,347 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .sleep input[type=time]{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
 .sleep button{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--fg);cursor:pointer}
 .tl li.wake .t,.tl li.sleep .t{color:var(--muted)}
+.ic{width:20px;height:20px;flex:none;vertical-align:-4px;margin-right:8px}
+.ic.sm{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+.ic.big{width:28px;height:28px;margin:0 0 6px}
+h1>span,h2{display:flex;align-items:center}
+h2 .ic{color:var(--muted)}
+.act{display:grid;justify-items:start}
+.tabbar button svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tl li .k{display:flex;align-items:center;flex-wrap:wrap;gap:0 6px}
+.tl li.meal .k .ic{color:var(--meal)} .tl li.stick .k .ic{color:var(--stick)}
+.tl li button{display:flex;align-items:center} .tl li button .ic{margin:0}
+.sleep div span{display:flex;align-items:center}
+.timerow button,.askBtns button,.filebtn{display:inline-flex;align-items:center;justify-content:center}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="i-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-utensils"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+  <path d="M7 2v20" />
+  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol><symbol id="i-stick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-cigarette"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M17 12H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14" />
+  <path d="M18 8c0-2.5-2-2.5-2-5" />
+  <path d="M21 16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+  <path d="M22 8c0-2.5-2-2.5-2-5" />
+  <path d="M7 12v4" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-clock-3"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <polyline points="12 6 12 12 16.5 12" /></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 12h.01" />
+  <path d="M3 18h.01" />
+  <path d="M3 6h.01" />
+  <path d="M8 12h13" />
+  <path d="M8 18h13" />
+  <path d="M8 6h13" /></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-chart-column"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M18 17V9" />
+  <path d="M13 17V5" />
+  <path d="M8 17v-3" /></symbol><symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+  <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-history"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+  <path d="M3 3v5h5" />
+  <path d="M12 7v5l4 2" /></symbol><symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-trash-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 6h18" />
+  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+  <line x1="10" x2="10" y1="11" y2="17" />
+  <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-upload"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="17 8 12 3 7 8" />
+  <line x1="12" x2="12" y1="3" y2="15" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-refresh-cw"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+  <path d="M21 3v5h-5" />
+  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+  <path d="M8 16H3v5" /></symbol><symbol id="i-bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-bed"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2 4v16" />
+  <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+  <path d="M2 17h20" />
+  <path d="M6 8v9" /></symbol><symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-sunrise"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 2v8" />
+  <path d="m4.93 10.93 1.41 1.41" />
+  <path d="M2 18h2" />
+  <path d="M20 18h2" />
+  <path d="m19.07 10.93-1.41 1.41" />
+  <path d="M22 22H2" />
+  <path d="m8 6 4-4 4 4" />
+  <path d="M16 18a4 4 0 0 0-8 0" /></symbol><symbol id="i-alarm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-alarm-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="13" r="8" />
+  <path d="M12 9v4l2 2" />
+  <path d="M5 3 2 6" />
+  <path d="m22 6-3-3" />
+  <path d="M6.38 18.7 4 21" />
+  <path d="M17.64 18.67 20 21" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" /></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-plus"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="M12 5v14" /></symbol><symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v0.468.0 - ISC -->
+<svg
+  class="lucide lucide-timer"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="10" x2="14" y1="2" y2="2" />
+  <line x1="12" x2="15" y1="14" y2="11" />
+  <circle cx="12" cy="14" r="8" /></symbol></svg>
 <div class="wrap">
 <main class="tab" id="tab-home">
-  <h1>Їжа та стіки <small id="dateLabel"></small></h1>
+  <h1><span><svg class="ic"><use href="#i-meal"/></svg>Їжа та стіки</span> <small id="dateLabel"></small></h1>
   <section class="card status" id="status" aria-live="polite">
-    <div class="label">Статус</div>
+    <div class="label"><svg class="ic sm"><use href="#i-timer"/></svg>Статус</div>
     <div class="big" id="stBig">Завантаження…</div>
     <div class="sub" id="stSub"></div>
     <div class="counts">
@@ -150,8 +481,8 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     </div>
   </section>
   <div class="actions">
-    <button class="act meal" id="btnMeal">Я поїв <small>записати зараз</small></button>
-    <button class="act stick" id="btnStick">Стік <small>записати зараз</small></button>
+    <button class="act meal" id="btnMeal"><svg class="ic big"><use href="#i-meal"/></svg><span>Я поїв <small>записати зараз</small></span></button>
+    <button class="act stick" id="btnStick"><svg class="ic big"><use href="#i-stick"/></svg><span>Стік <small>записати зараз</small></span></button>
   </div>
   <section class="card choose" id="choose" hidden>
     <div class="big">Що це був за прийом? <span class="note" id="chooseTime"></span></div>
@@ -169,43 +500,43 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
   <div class="timerow">
     <span>Або інший час:</span>
     <input type="time" id="customTime" aria-label="Час події">
-    <button id="btnMealAt">+ їжа</button>
-    <button id="btnStickAt">+ стік</button>
+    <button id="btnMealAt"><svg class="ic sm"><use href="#i-plus"/></svg>їжа</button>
+    <button id="btnStickAt"><svg class="ic sm"><use href="#i-plus"/></svg>стік</button>
   </div>
   <section class="card">
-    <h2>Сон</h2>
+    <h2><svg class="ic"><use href="#i-bed"/></svg>Сон</h2>
     <div class="sleep">
-      <div><span>Прокинувся</span><input type="time" id="wakeIn" aria-label="Час підйому"><button data-w="wake">Зараз</button></div>
-      <div><span>Ліг спати</span><input type="time" id="sleepIn" aria-label="Час відбою"><button data-w="sleep">Зараз</button></div>
+      <div><span><svg class="ic sm"><use href="#i-sunrise"/></svg>Прокинувся</span><input type="time" id="wakeIn" aria-label="Час підйому"><button data-w="wake">Зараз</button></div>
+      <div><span><svg class="ic sm"><use href="#i-moon"/></svg>Ліг спати</span><input type="time" id="sleepIn" aria-label="Час відбою"><button data-w="sleep">Зараз</button></div>
     </div>
     <p class="note" id="sleepNote" style="margin:8px 0 0"></p>
   </section>
   <section class="card">
-    <h2>План їжі</h2>
+    <h2><svg class="ic"><use href="#i-clock"/></svg>План їжі</h2>
     <div class="plan" id="plan"></div>
     <p class="note" style="margin:10px 0 0">Стік не раніше ніж через 2 год після їжі і не натщесерце.</p>
   </section>
   <section class="card">
-    <h2>Сьогодні</h2>
+    <h2><svg class="ic"><use href="#i-list"/></svg>Сьогодні</h2>
     <ul class="tl" id="timeline"></ul>
     <p class="empty" id="tlEmpty">Ще нічого не записано. Після їжі натисни «Я поїв».</p>
   </section>
 </main>
 
 <main class="tab" id="tab-history" hidden>
-  <h1>Історія</h1>
+  <h1><span><svg class="ic"><use href="#i-history"/></svg>Історія</span></h1>
   <div class="seg" id="seg" role="tablist">
     <button data-p="day" class="on">День</button><button data-p="week">Тиждень</button><button data-p="month">Місяць</button>
   </div>
   <div id="histStats" class="tiles"></div>
-  <section class="card" id="histChartCard"><h2 id="histChartTitle">Стіки по днях</h2><div class="week" id="histChart"></div></section>
-  <section class="card"><h2 id="histListTitle">Дні</h2><ul class="days" id="histList"></ul><p class="empty" id="histEmpty">Ще немає записів.</p></section>
+  <section class="card" id="histChartCard"><h2><svg class="ic"><use href="#i-chart"/></svg><span id="histChartTitle">Стіки по днях</span></h2><div class="week" id="histChart"></div></section>
+  <section class="card"><h2><svg class="ic"><use href="#i-list"/></svg><span id="histListTitle">Дні</span></h2><ul class="days" id="histList"></ul><p class="empty" id="histEmpty">Ще немає записів.</p></section>
 </main>
 
 <main class="tab" id="tab-settings" hidden>
-  <h1>Налаштування</h1>
+  <h1><span><svg class="ic"><use href="#i-settings"/></svg>Налаштування</span></h1>
   <section class="card">
-    <h2>План і ліміти</h2>
+    <h2><svg class="ic"><use href="#i-alarm"/></svg>План і ліміти</h2>
     <div class="set">
       <label><span class="lt">Прокидаюсь о<small>Від цього часу будується базовий план: перший прийом їжі через 30 хв після підйому.</small></span><input type="time" id="sWake"></label>
       <label><span class="lt">Прийомів їжі на день<small>Скільки основних прийомів у плані (сніданок, обід, вечеря...). Перекуси сюди не входять.</small></span><input type="number" id="sMeals" min="3" max="6"></label>
@@ -217,24 +548,24 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
     </div>
   </section>
   <section class="card">
-    <h2>Бекап</h2>
+    <h2><svg class="ic"><use href="#i-download"/></svg>Бекап</h2>
     <p class="note" style="margin:0 0 10px">Дані зберігаються на цьому пристрої. Раз на тиждень зроби експорт - файл можна зберегти в iCloud і відновити з нього.</p>
     <div class="askBtns">
-      <button id="btnExport">Експорт JSON</button>
-      <label class="filebtn"><input type="file" id="importFile" accept="application/json,.json" hidden>Імпорт JSON</label>
+      <button id="btnExport"><svg class="ic sm"><use href="#i-download"/></svg>Експорт JSON</button>
+      <label class="filebtn"><input type="file" id="importFile" accept="application/json,.json" hidden><svg class="ic sm"><use href="#i-upload"/></svg>Імпорт JSON</label>
     </div>
   </section>
   <section class="card">
-    <h2>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">7</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
-    <button id="btnUpdate" class="filebtn" style="width:100%">Оновити додаток</button>
+    <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">8</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
 </div>
 <nav class="tabbar" aria-label="Розділи">
-  <button data-tab="home" class="on"><svg viewBox="0 0 24 24"><path d="M12 3 3 11h2v9h5v-6h4v6h5v-9h2z"/></svg>Головна</button>
-  <button data-tab="history"><svg viewBox="0 0 24 24"><path d="M4 20h16v-2H4zm2-4h3V9H6zm5 0h3V4h-3zm5 0h3v-7h-3z"/></svg>Історія</button>
-  <button data-tab="settings"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.6 3-2.1-.4a6.6 6.6 0 0 0-.6-1.5l1.2-1.8-2.4-2.4-1.8 1.2a6.6 6.6 0 0 0-1.5-.6L13 3h-2l-.4 2.1a6.6 6.6 0 0 0-1.5.6L7.3 4.5 4.9 6.9l1.2 1.8a6.6 6.6 0 0 0-.6 1.5L3.4 11v2l2.1.4c.1.5.4 1 .6 1.5l-1.2 1.8 2.4 2.4 1.8-1.2c.5.3 1 .5 1.5.6L11 21h2l.4-2.1c.5-.1 1-.4 1.5-.6l1.8 1.2 2.4-2.4-1.2-1.8c.3-.5.5-1 .6-1.5l2.1-.4z"/></svg>Налашт.</button>
+  <button data-tab="home" class="on"><svg><use href="#i-home"/></svg>Головна</button>
+  <button data-tab="history"><svg><use href="#i-chart"/></svg>Історія</button>
+  <button data-tab="settings"><svg><use href="#i-settings"/></svg>Налашт.</button>
 </nav>
 <div class="ptr" id="ptr"><span id="ptrText">Потягни, щоб оновити</span></div>
 <div class="toast" id="toast"></div>
@@ -416,7 +747,8 @@ ul.days{list-style:none;margin:0;padding:0;display:grid;gap:6px}
       let note=""; if(e.k==="stick"){const prev=[...today.meals].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)} після їжі`:"натщесерце";}
       else{note="";}
       const label=e.k==="meal"?(today.types[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон";
-      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k">${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити">×</button></li>`;
+      const ico={meal:"meal",stick:"stick",wake:"sunrise",sleep:"moon"}[e.k];
+      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k"><svg class="ic sm"><use href="#i-${ico}"/></svg>${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button></li>`;
     }).join("");
     $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);});
 
