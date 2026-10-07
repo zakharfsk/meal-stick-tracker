@@ -176,6 +176,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .choose:not([hidden]),.ask:not([hidden]){animation:popIn .2s ease-out}
 .tl li.new.meal,.tl li.new.wake,.tl li.new.sleep{animation:rowIn .7s ease-out}
 .tl li.new.stick{animation:rowInStick .7s ease-out}
+.tl li.confirm{background:var(--wait-soft)} .tl li.confirm button{color:var(--wait);font-weight:600;font-size:.85rem;padding:4px 8px;border:1px solid var(--wait);border-radius:8px;animation:popIn .15s ease-out}
 .tl li.removing{opacity:0;transform:translateX(16px);transition:opacity .18s ease,transform .18s ease}
 .status .big,.status .sub{animation:statusSwap .25s ease-out}
 .status .timer{display:inline-block}
@@ -323,7 +324,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">22</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">23</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -537,13 +538,22 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
       const ico={meal:"meal",stick:"stick",wake:"sunrise",sleep:"moon"}[e.k];
       return `<li class="${e.k}${e.t===lastAdded?" new":""}"><span class="t">${hm(e.t)}</span><span class="k"><svg class="ic sm"><use href="#i-${ico}"/></svg>${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button></li>`;
     }).join("");
-    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>{const li=b.closest("li");li.classList.add("removing");setTimeout(()=>{lastAdded=null;if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);},180);});
+    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const li=b.closest("li");
+      if(!li.classList.contains("confirm")){ // first tap: ask
+        $("timeline").querySelectorAll("li.confirm").forEach(x=>cancelConfirm(x));
+        li.classList.add("confirm"); b.innerHTML="Видалити?"; b.setAttribute("aria-label","Підтвердити видалення");
+        li._t=setTimeout(()=>cancelConfirm(li),4000); return;
+      }
+      clearTimeout(li._t); li.classList.remove("confirm"); li.classList.add("removing");
+      setTimeout(()=>{lastAdded=null;if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);},180);});
     if(lastAdded!==null) setTimeout(()=>{lastAdded=null;},800);
 
     renderHistory();
 
     if(document.activeElement!==$("sWake")){$("sWake").value=settings.wake;$("sMeals").value=settings.meals;$("sGapH").value=settings.gap/60;$("sInterval").value=settings.interval;$("sLimit").value=settings.limit;}
   }
+  function cancelConfirm(li){clearTimeout(li._t);li.classList.remove("confirm");const b=li.querySelector("button");if(b){b.innerHTML='<svg class="ic sm"><use href="#i-trash"/></svg>';b.setAttribute("aria-label","Видалити");}}
+  document.addEventListener("click",e=>{if(!e.target.closest("#timeline li.confirm"))$("timeline").querySelectorAll("li.confirm").forEach(cancelConfirm);});
   let toastT; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
 
 
