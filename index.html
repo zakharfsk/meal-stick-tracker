@@ -154,6 +154,37 @@ h2 .ic{color:var(--muted)}
 .more summary::-webkit-details-marker{display:none}
 .more[open] summary{color:var(--fg);margin-bottom:12px}
 .moreBody{display:grid;gap:12px}
+
+/* ---- motion ---- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px);background:var(--meal-soft)}60%{background:var(--meal-soft)}to{opacity:1;transform:none;background:var(--bg)}}
+@keyframes rowInStick{from{opacity:0;transform:translateX(-8px);background:var(--stick-soft)}60%{background:var(--stick-soft)}to{opacity:1;transform:none;background:var(--bg)}}
+@keyframes statusSwap{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tab{animation:fadeUp .22s ease-out}
+.card,.act,.tabbar button,.seg button,.tl li,.days li,.tile{transition:transform .12s ease,background-color .2s ease,color .2s ease,border-color .2s ease}
+.act:active,.askBtns button:active,.timerow button:active,.sleep button:active,.filebtn:active{transform:scale(.96)}
+.tabbar button:active{transform:scale(.9)}
+.tabbar button.on svg{animation:bump .3s ease}
+.choose:not([hidden]),.ask:not([hidden]){animation:popIn .2s ease-out}
+.tl li.new.meal,.tl li.new.wake,.tl li.new.sleep{animation:rowIn .7s ease-out}
+.tl li.new.stick{animation:rowInStick .7s ease-out}
+.tl li.removing{opacity:0;transform:translateX(16px);transition:opacity .18s ease,transform .18s ease}
+.status .big,.status .sub{animation:statusSwap .25s ease-out}
+.status .timer{display:inline-block}
+.pill{transition:transform .15s ease} .pill.bump{animation:bump .35s ease}
+.week .bar i{transition:height .45s cubic-bezier(.2,.8,.2,1)}
+.tile .v{animation:statusSwap .3s ease-out}
+.days .sub{animation:fadeUp .2s ease-out}
+.moreBody{animation:fadeUp .2s ease-out}
+.toast.show{animation:toastIn .2s ease-out}
+.ptr.show span{transition:transform .05s linear,opacity .15s}
+.ptr span .ic{margin-right:6px} .ptr.ready span .ic{animation:spin .8s linear infinite}
+.plan span{transition:border-color .2s,color .2s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -565,7 +596,7 @@ h2 .ic{color:var(--muted)}
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">10</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">11</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -575,7 +606,7 @@ h2 .ic{color:var(--muted)}
   <button data-tab="history"><svg><use href="#i-chart"/></svg>Історія</button>
   <button data-tab="settings"><svg><use href="#i-settings"/></svg>Налашт.</button>
 </nav>
-<div class="ptr" id="ptr"><span id="ptrText">Потягни, щоб оновити</span></div>
+<div class="ptr" id="ptr"><span><svg class="ic sm"><use href="#i-refresh"/></svg><span id="ptrText">Потягни, щоб оновити</span></span></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -585,7 +616,7 @@ h2 .ic{color:var(--muted)}
   let settings={...DEF};
   let today={meals:[],sticks:[],types:{},wake:null,sleep:null};
   const TYPES=["Сніданок","Обід","Вечеря","Перекус"];
-  let pendingMealMs=null;
+  let pendingMealMs=null, lastAdded=null, lastStatusCls=null;
   function mainMeals(){return today.meals.filter(m=>today.types[m]!=="Перекус");}
   let week={};  // key -> {sticks:n}
   let db=null, unsubToday=null, saving=false;
@@ -674,8 +705,9 @@ h2 .ic{color:var(--muted)}
   // ---- actions
   function addEvent(kind,ms,type){
     const arr=kind==="meal"?today.meals:today.sticks;
-    arr.push(ms); arr.sort((a,b)=>a-b);
+    arr.push(ms); arr.sort((a,b)=>a-b); lastAdded=ms;
     if(kind==="meal"&&type) today.types[ms]=type;
+    $(kind==="meal"?"mealCount":"stickCount").classList.remove("bump"); void $("mealCount").offsetWidth; $(kind==="meal"?"mealCount":"stickCount").classList.add("bump");
     if(kind==="stick"&&today.sticks.length>settings.limit) toast(`Це ${today.sticks.length}-й стік, ціль ${settings.limit}`);
     saveToday();
   }
@@ -707,7 +739,7 @@ h2 .ic{color:var(--muted)}
   }
   $("chooseCancel").onclick=()=>{$("choose").hidden=true;};
   $("btnStickAt").onclick=()=>{const m=customMs();if(m)addEvent("stick",m);else toast("Вкажи час");};
-  function setSleepEv(kind,ms){today[kind]=ms;saveToday();toast(kind==="wake"?"Підйом записано":"Добраніч");}
+  function setSleepEv(kind,ms){today[kind]=ms;lastAdded=ms;saveToday();toast(kind==="wake"?"Підйом записано":"Добраніч");}
   document.querySelectorAll(".sleep button").forEach(b=>b.onclick=()=>setSleepEv(b.dataset.w,Date.now()));
   $("wakeIn").onchange=e=>{const v=e.target.value;if(!v)return;setSleepEv("wake",todayAt(minsOf(v)<DAY_SHIFT?minsOf(v)+24*60:minsOf(v)));};
   $("sleepIn").onchange=e=>{const v=e.target.value;if(!v)return;setSleepEv("sleep",todayAt(minsOf(v)<DAY_SHIFT?minsOf(v)+24*60:minsOf(v)));};
@@ -734,6 +766,7 @@ h2 .ic{color:var(--muted)}
   }
   function render(){
     const s=statusNow(); const st=$("status"); st.className="card status "+s.cls;
+    if(s.cls!==lastStatusCls){lastStatusCls=s.cls;["stBig","stSub"].forEach(id=>{const e=$(id);e.style.animation="none";void e.offsetWidth;e.style.animation="";});}
     $("stBig").innerHTML=s.big; $("stSub").textContent=s.sub;
     $("mealCount").textContent=`Їжа ${mainMeals().length}/${settings.meals}`;
     $("stickCount").textContent=`Стіки ${today.sticks.length}/${settings.limit}`;
@@ -756,9 +789,10 @@ h2 .ic{color:var(--muted)}
       else{note="";}
       const label=e.k==="meal"?(today.types[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон";
       const ico={meal:"meal",stick:"stick",wake:"sunrise",sleep:"moon"}[e.k];
-      return `<li class="${e.k}"><span class="t">${hm(e.t)}</span><span class="k"><svg class="ic sm"><use href="#i-${ico}"/></svg>${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button></li>`;
+      return `<li class="${e.k}${e.t===lastAdded?" new":""}"><span class="t">${hm(e.t)}</span><span class="k"><svg class="ic sm"><use href="#i-${ico}"/></svg>${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button></li>`;
     }).join("");
-    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);});
+    $("timeline").querySelectorAll("button").forEach(b=>b.onclick=()=>{const li=b.closest("li");li.classList.add("removing");setTimeout(()=>{lastAdded=null;if(b.dataset.k==="wake"||b.dataset.k==="sleep"){today[b.dataset.k]=null;saveToday();}else removeEvent(b.dataset.k,+b.dataset.t);},180);});
+    if(lastAdded!==null) setTimeout(()=>{lastAdded=null;},800);
 
     renderHistory();
 
@@ -824,7 +858,8 @@ h2 .ic{color:var(--muted)}
     const max=Math.max(settings.limit,...chartKeys.map(k=>(allDays[k]?allDays[k].sticks.length:0)),1);
     w.innerHTML=chartKeys.map(k=>{const c=allDays[k]?allDays[k].sticks.length:0;const h=Math.round(c/max*44);const over=settings.limit>0&&c>settings.limit;const d=keyDate(k);
       const lab=period==="month"?(d.getDate()%5===1||chartKeys.length<10?String(d.getDate()):""):d.toLocaleDateString("uk-UA",{weekday:"short"});
-      return `<div class="d"><div class="bar"><i class="${over?"over":""}" style="height:${h}px"></i></div><div class="n">${period==="month"?(c||""):c}</div><div>${lab}</div></div>`;}).join("");
+      return `<div class="d"><div class="bar"><i class="${over?"over":""}" data-h="${h}" style="height:2px"></i></div><div class="n">${period==="month"?(c||""):c}</div><div>${lab}</div></div>`;}).join("");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>w.querySelectorAll("i").forEach(i=>i.style.height=i.dataset.h+"px")));
     // list
     $("histListTitle").textContent=period==="day"?"Усі дні":"Дні періоду";
     $("histList").innerHTML=keys.filter(k=>allDays[k]).map(k=>{
@@ -856,7 +891,7 @@ h2 .ic{color:var(--muted)}
   }
 
   // ---- boot
-  render(); setInterval(render,30000);
+  render(); setInterval(render,15000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
   loadAll();
   $("btnExport").onclick=exportJson;
