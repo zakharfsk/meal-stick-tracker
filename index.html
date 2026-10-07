@@ -188,13 +188,43 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .ptr .ic{margin-right:6px} .ptr.ready .ic{animation:spin .8s linear infinite}
 .plan span{transition:border-color .2s,color .2s}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.grp{margin:4px 0 0;color:var(--muted);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.grp .ic{width:16px;height:16px}
+.tile .v small{font-size:.85rem;color:var(--muted);font-weight:500;margin-left:4px}
+.tile .d{font-size:.75rem;margin-top:4px;font-weight:500;display:flex;align-items:center;gap:4px}
+.tile .d.up{color:var(--wait)} .tile .d.down{color:var(--meal)} .tile .d.flat{color:var(--muted)}
+.tile .d .ic{width:12px;height:12px;margin:0}
+.tile.good .v{color:var(--meal)}
+.hours{display:grid;gap:8px}
+.hours div{display:grid;grid-template-columns:64px 1fr 40px;align-items:center;gap:10px;font-size:.85rem}
+.hours .bar{height:12px;background:var(--bg);border-radius:6px;overflow:hidden}
+.hours .bar i{display:block;height:100%;background:var(--stick);border-radius:6px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.hours .bar i.night{background:var(--wait)}
+.hours .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.heat{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.heat .col{display:grid;grid-template-rows:repeat(7,1fr);gap:3px}
+.heat i{display:block;aspect-ratio:1;border-radius:3px;background:var(--bg);border:1px solid var(--line)}
+.heat i.l1,.heatLegend i.l1{background:color-mix(in srgb,var(--meal) 30%,var(--bg))}
+.heat i.l2,.heatLegend i.l2{background:color-mix(in srgb,var(--meal) 60%,var(--bg))}
+.heat i.l3,.heatLegend i.l3{background:var(--meal)}
+.heat i.l4,.heatLegend i.l4{background:color-mix(in srgb,var(--wait) 60%,var(--bg))}
+.heat i.l5,.heatLegend i.l5{background:var(--wait)}
+.heat i.today{outline:2px solid var(--fg);outline-offset:-1px}
+.heat i.future{opacity:.3;border-style:dashed}
+.heatLegend{display:flex;align-items:center;gap:4px;margin-top:10px;font-size:.72rem;color:var(--muted)}
+.heatLegend i{width:12px;height:12px;border-radius:3px;background:var(--bg);border:1px solid var(--line)}
+.heatLegend span{margin:0 4px}
+.report{border-color:var(--meal);background:linear-gradient(180deg,var(--meal-soft),var(--card) 70%)}
+.report p{margin:0 0 6px;font-size:.92rem} .report p:last-child{margin:0}
+.report b{font-family:var(--display);font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><!-- Lucide icons (ISC) --><symbol id="i-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /> <path d="M7 2v20" /> <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol><symbol id="i-stick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 12H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14" /> <path d="M18 8c0-2.5-2-2.5-2-5" /> <path d="M21 16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /> <path d="M22 8c0-2.5-2-2.5-2-5" /> <path d="M7 12v4" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <polyline points="12 6 12 12 16.5 12" /></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01" /> <path d="M3 18h.01" /> <path d="M3 6h.01" /> <path d="M8 12h13" /> <path d="M8 18h13" /> <path d="M8 6h13" /></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></symbol><symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /> <path d="M12 7v5l4 2" /></symbol><symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="17 8 12 3 7 8" /> <line x1="12" x2="12" y1="3" y2="15" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol><symbol id="i-bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /> <path d="M2 8h18a2 2 0 0 1 2 2v10" /> <path d="M2 17h20" /> <path d="M6 8v9" /></symbol><symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8" /> <path d="m4.93 10.93 1.41 1.41" /> <path d="M2 18h2" /> <path d="M20 18h2" /> <path d="m19.07 10.93-1.41 1.41" /> <path d="M22 22H2" /> <path d="m8 6 4-4 4 4" /> <path d="M16 18a4 4 0 0 0-8 0" /></symbol><symbol id="i-alarm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol><symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><!-- Lucide icons (ISC) --><symbol id="i-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /> <path d="M7 2v20" /> <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol><symbol id="i-stick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 12H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14" /> <path d="M18 8c0-2.5-2-2.5-2-5" /> <path d="M21 16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /> <path d="M22 8c0-2.5-2-2.5-2-5" /> <path d="M7 12v4" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <polyline points="12 6 12 12 16.5 12" /></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01" /> <path d="M3 18h.01" /> <path d="M3 6h.01" /> <path d="M8 12h13" /> <path d="M8 18h13" /> <path d="M8 6h13" /></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></symbol><symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /> <path d="M12 7v5l4 2" /></symbol><symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="17 8 12 3 7 8" /> <line x1="12" x2="12" y1="3" y2="15" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol><symbol id="i-bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /> <path d="M2 8h18a2 2 0 0 1 2 2v10" /> <path d="M2 17h20" /> <path d="M6 8v9" /></symbol><symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8" /> <path d="m4.93 10.93 1.41 1.41" /> <path d="M2 18h2" /> <path d="M20 18h2" /> <path d="m19.07 10.93-1.41 1.41" /> <path d="M22 22H2" /> <path d="m8 6 4-4 4 4" /> <path d="M16 18a4 4 0 0 0-8 0" /></symbol><symbol id="i-alarm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol><symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /> <path d="M20 3v4" /> <path d="M22 5h-4" /> <path d="M4 17v2" /> <path d="M5 18H3" /></symbol><symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4" /> <path d="M16 2v4" /> <rect width="18" height="18" x="3" y="4" rx="2" /> <path d="M3 10h18" /> <path d="M8 14h.01" /> <path d="M12 14h.01" /> <path d="M16 14h.01" /> <path d="M8 18h.01" /> <path d="M12 18h.01" /> <path d="M16 18h.01" /></symbol><symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /> <polyline points="16 7 22 7 22 13" /></symbol><symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7" /> <polyline points="16 17 22 17 22 11" /></symbol><symbol id="i-flat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></symbol></svg>
 <div class="wrap">
 <main class="tab" id="tab-home">
   <h1><span><svg class="ic"><use href="#i-meal"/></svg>Їжа та стіки</span> <small id="dateLabel"></small></h1>
@@ -253,9 +283,15 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   <div class="seg" id="seg" role="tablist">
     <button data-p="day" class="on">День</button><button data-p="week">Тиждень</button><button data-p="month">Місяць</button>
   </div>
-  <div id="histStats" class="tiles"></div>
+  <p class="empty" id="histEmpty">Ще немає записів.</p>
+  <section class="card report" id="report" hidden><h2><svg class="ic"><use href="#i-sparkles"/></svg><span id="reportTitle">Підсумок</span></h2><div id="reportBody"></div></section>
+  <section id="grpSticks"><h2 class="grp"><svg class="ic"><use href="#i-stick"/></svg>Стіки</h2><div class="tiles" id="tilesSticks"></div></section>
   <section class="card" id="histChartCard"><h2><svg class="ic"><use href="#i-chart"/></svg><span id="histChartTitle">Стіки по днях</span></h2><div class="week" id="histChart"></div></section>
-  <section class="card"><h2><svg class="ic"><use href="#i-list"/></svg><span id="histListTitle">Дні</span></h2><ul class="days" id="histList"></ul><p class="empty" id="histEmpty">Ще немає записів.</p></section>
+  <section class="card"><h2><svg class="ic"><use href="#i-clock"/></svg>Коли курю</h2><div class="hours" id="hours"></div></section>
+  <section id="grpFood"><h2 class="grp"><svg class="ic"><use href="#i-meal"/></svg>Їжа та жовчний</h2><div class="tiles" id="tilesFood"></div></section>
+  <section id="grpSleep"><h2 class="grp"><svg class="ic"><use href="#i-bed"/></svg>Сон</h2><div class="tiles" id="tilesSleep"></div></section>
+  <section class="card" id="heatCard"><h2><svg class="ic"><use href="#i-calendar"/></svg>Останні 12 тижнів</h2><div class="heat" id="heat"></div><div class="heatLegend"><span>0</span><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><span>у межах цілі</span><i class="l4"></i><i class="l5"></i><span>понад</span></div></section>
+  <section class="card"><h2><svg class="ic"><use href="#i-list"/></svg><span id="histListTitle">Дні</span></h2><ul class="days" id="histList"></ul></section>
 </main>
 
 <main class="tab" id="tab-settings" hidden>
@@ -282,7 +318,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">15</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">16</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -316,20 +352,22 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   function fmtDur(ms){const m=Math.max(0,Math.ceil(ms/60000));const h=Math.floor(m/60),mm=m%60;return h?`${h} год ${String(mm).padStart(2,"0")} хв`:`${mm} хв`;}
 
   // ---- meal plan: base from real wake (or the wake-time setting); a logged breakfast re-anchors the whole plan
-  function basePlan(){
-    const dayStart0=keyDate(dayKey()).setHours(0,0,0,0);
-    const wakeMin=today.wake?Math.round((today.wake-dayStart0)/60000):null;
+  function basePlanFor(rec,k){
+    const dayStart0=keyDate(k).setHours(0,0,0,0);
+    const wakeMin=rec.wake?Math.round((rec.wake-dayStart0)/60000):null;
     const first=(wakeMin!==null&&wakeMin<19*60?wakeMin:minsOf(settings.wake))+30; // a wake logged after 19:00 is ignored for the plan
     const n=settings.meals; let step=(+settings.interval||3.5)*60;
     const hardLast=22*60;
     if(n>1&&first+(n-1)*step>hardLast) step=Math.max(90,(hardLast-first)/(n-1));
     return Array.from({length:n},(_,i)=>Math.round(first+i*step));
   }
-  function plan(){
-    const base=basePlan(); const n=base.length;
-    const bf=today.meals.find(m=>today.types[m]==="Сніданок");
+  function basePlan(){return basePlanFor(today,dayKey());}
+  function plan(){return planFor(today,dayKey());}
+  function planFor(rec,k){
+    const base=basePlanFor(rec,k); const n=base.length; const types=rec.types||{};
+    const bf=(rec.meals||[]).find(m=>types[m]==="Сніданок");
     if(bf===undefined) return base;
-    const dayStart=keyDate(dayKey()).setHours(0,0,0,0);
+    const dayStart=keyDate(k).setHours(0,0,0,0);
     const first=Math.round((bf-dayStart)/60000);
     let step=n>1?base[1]-base[0]:0;
     const hardLast=22*60; // compress if breakfast was late
@@ -506,67 +544,189 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   showTab(curTab);
 
   // ---- history
-  function dayStats(rec){
-    const meals=rec.meals||[], sticks=rec.sticks||[], types=rec.types||{};
-    const gaps=sticks.map(t=>{const prev=[...meals].reverse().find(m=>m<=t);return prev?(t-prev)/60000:null;});
-    const known=gaps.filter(g=>g!==null);
-    return {sticks:sticks.length,meals:meals.filter(m=>types[m]!=="Перекус").length,snacks:meals.filter(m=>types[m]==="Перекус").length,
-      avgGap:known.length?known.reduce((a,b)=>a+b,0)/known.length:null,early:gaps.filter(g=>g!==null&&g<settings.gap).length,fasting:gaps.filter(g=>g===null).length};
+  const H=3600000, MIN=60000;
+  const minsInDay=(ms,k)=>Math.round((ms-keyDate(k).setHours(0,0,0,0))/MIN);
+  const hmFromMin=m=>`${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+  const sd=a=>{if(a.length<2)return null;const m=avg(a);return Math.sqrt(avg(a.map(x=>(x-m)*(x-m))));};
+  const bucketOf=ms=>{const h=new Date(ms).getHours();return h<5?3:h<12?0:h<17?1:h<22?2:3;};
+  const BUCKETS=["Ранок","День","Вечір","Ніч"];
+  function slotIndexes(rec,n){ // which plan slot each main meal fills
+    const types=rec.types||{}, used=new Set(), out=[];
+    const free=()=>{for(let i=1;i<n-1;i++)if(!used.has(i))return i;for(let i=0;i<n;i++)if(!used.has(i))return i;return -1;};
+    (rec.meals||[]).filter(m=>types[m]!=="Перекус").forEach(m=>{const t=types[m];let i=t==="Сніданок"&&!used.has(0)?0:t==="Вечеря"&&!used.has(n-1)?n-1:free();if(i>=0)used.add(i);out.push([m,i]);});
+    return out;
   }
-  function lastKeys(n){const r=[];for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);r.push(dayKey(d));}return r;}
-  function tile(v,l,cls){return `<div class="tile ${cls||""}"><div class="v">${v}</div><div class="l">${l}</div></div>`;}
+  function dayStats(rec,k){
+    const meals=(rec.meals||[]).slice().sort((a,b)=>a-b), sticks=(rec.sticks||[]).slice().sort((a,b)=>a-b), types=rec.types||{};
+    const mains=meals.filter(m=>types[m]!=="Перекус");
+    const gaps=sticks.map(t=>{const prev=[...meals].reverse().find(m=>m<=t);return prev?(t-prev)/MIN:null;});
+    const known=gaps.filter(g=>g!==null);
+    const ok=gaps.filter(g=>g!==null&&g>=settings.gap).length;
+    const intervals=sticks.slice(1).map((t,i)=>(t-sticks[i])/MIN);
+    const longest=Math.max(0,...intervals,...(rec.wake&&sticks.length?[(sticks[0]-rec.wake)/MIN]:[]));
+    const dinner=[...meals].reverse().find(m=>types[m]==="Вечеря");
+    const lateFrom=dinner||keyDate(k).setHours(21,0,0,0);
+    const late=sticks.filter(t=>t>lateFrom).length;
+    const buckets=[0,0,0,0]; sticks.forEach(t=>buckets[bucketOf(t)]++);
+    const mealGaps=meals.slice(1).map((t,i)=>(t-meals[i])/MIN);
+    const pr=allDays[prevKey(k)];
+    const sleepH=pr&&pr.sleep&&rec.wake?(rec.wake-pr.sleep)/H:null;
+    const n=settings.meals; const pl=planFor(rec,k);
+    const dev=slotIndexes(rec,n).filter(([m,i])=>i>=0).map(([m,i])=>Math.abs(minsInDay(m,k)-pl[i]));
+    const isToday=k===dayKey();
+    return {sticks:sticks.length,meals:mains.length,snacks:meals.length-mains.length,
+      avgGap:avg(known),early:gaps.filter(g=>g!==null&&g<settings.gap).length,fasting:gaps.filter(g=>g===null).length,ok,
+      firstAfterWake:rec.wake&&sticks.length?(sticks[0]-rec.wake)/MIN:null,
+      avgInterval:avg(intervals),longest:intervals.length||(rec.wake&&sticks.length)?longest:null,late,buckets,
+      mealGapAvg:avg(mealGaps),mealGapMax:mealGaps.length?Math.max(...mealGaps):null,
+      lastMealBeforeSleep:rec.sleep&&meals.length?(rec.sleep-meals[meals.length-1])/MIN:null,
+      planDev:avg(dev),missed:isToday?null:Math.max(0,n-mains.length),
+      sleepH:sleepH!==null&&sleepH>0&&sleepH<20?sleepH:null,
+      wakeMin:rec.wake?minsInDay(rec.wake,k):null,sleepMin:rec.sleep?minsInDay(rec.sleep,k):null,
+      withinLimit:settings.limit>0?sticks.length<=settings.limit:true};
+  }
+  function lastKeys(n,offset=0){const r=[];for(let i=n-1+offset;i>=offset;i--){const d=new Date();d.setDate(d.getDate()-i);r.push(dayKey(d));}return r;}
+  function tile(v,l,cls,delta){return `<div class="tile ${cls||""}"><div class="v">${v}</div><div class="l">${l}</div>${delta||""}</div>`;}
+  function fmtH(min){if(min===null||min===undefined)return "–";const h=Math.floor(min/60),m=Math.round(min%60);return h?`${h} год${m?` ${m} хв`:""}`:`${m} хв`;}
+  function delta(cur,prev,lowerIsBetter=true,unit=""){ // trend chip vs previous period
+    if(cur===null||prev===null||prev===undefined)return "";
+    const d=cur-prev; if(Math.abs(d)<0.05)return `<div class="d flat"><svg class="ic"><use href="#i-flat"/></svg>як минулого разу</div>`;
+    const better=lowerIsBetter?d<0:d>0; const pct=prev?Math.round(Math.abs(d)/Math.abs(prev)*100):null;
+    const num=Number.isInteger(cur)&&Number.isInteger(prev)?Math.abs(d).toFixed(0):Math.abs(d).toFixed(unit===" хв"||unit==="%"?0:1);
+    return `<div class="d ${better?"down":"up"}"><svg class="ic"><use href="#i-${d<0?"down":"up"}"/></svg>${d>0?"+":"−"}${num}${unit}${pct!==null?` (${pct}%)`:""} до минулого</div>`;
+  }
+  function streaks(){ // days within limit, ending today/yesterday
+    const keys=Object.keys(allDays).sort(); let cur=0,best=0,run=0,prev=null;
+    for(const k of keys){const st=dayStats(allDays[k],k);const consecutive=prev&&keyDate(k)-keyDate(prev)===86400000;run=st.withinLimit?(consecutive?run+1:1):0;best=Math.max(best,run);prev=k;}
+    const last=keys[keys.length-1]; const t=dayKey(), y=lastKeys(2)[0];
+    cur=(last===t||last===y)?run:0; return {cur,best};
+  }
+  function periodAgg(keys){
+    const recs=keys.map(k=>allDays[k]).filter(Boolean); const st=keys.filter(k=>allDays[k]).map(k=>dayStats(allDays[k],k));
+    const n=keys.length, logged=st.length;
+    const total=st.reduce((a,x)=>a+x.sticks,0);
+    const okAll=st.reduce((a,x)=>a+x.ok,0), gapKnown=st.reduce((a,x)=>a+x.ok+x.early,0);
+    const buckets=[0,0,0,0]; st.forEach(x=>x.buckets.forEach((v,i)=>buckets[i]+=v));
+    const short=st.filter(x=>x.sleepH!==null&&x.sleepH<7), normal=st.filter(x=>x.sleepH!==null&&x.sleepH>=7);
+    return {n,logged,total,avgPerDay:logged?total/logged:null,within:st.filter(x=>x.withinLimit).length,maxDay:Math.max(0,...st.map(x=>x.sticks)),
+      avgGap:avg(st.filter(x=>x.avgGap!==null).map(x=>x.avgGap)),early:st.reduce((a,x)=>a+x.early+x.fasting,0),
+      okPct:gapKnown?Math.round(okAll/gapKnown*100):null,
+      firstAfterWake:avg(st.filter(x=>x.firstAfterWake!==null).map(x=>x.firstAfterWake)),
+      avgInterval:avg(st.filter(x=>x.avgInterval!==null).map(x=>x.avgInterval)),
+      longest:Math.max(0,...st.map(x=>x.longest||0))||null,late:st.reduce((a,x)=>a+x.late,0),buckets,
+      mealsAvg:logged?st.reduce((a,x)=>a+x.meals,0)/logged:null,snacks:st.reduce((a,x)=>a+x.snacks,0),
+      mealGapAvg:avg(st.filter(x=>x.mealGapAvg!==null).map(x=>x.mealGapAvg)),mealGapMax:Math.max(0,...st.map(x=>x.mealGapMax||0))||null,
+      lastMealBeforeSleep:avg(st.filter(x=>x.lastMealBeforeSleep!==null).map(x=>x.lastMealBeforeSleep)),
+      planDev:avg(st.filter(x=>x.planDev!==null).map(x=>x.planDev)),missed:st.reduce((a,x)=>a+(x.missed||0),0),
+      sleepAvg:avg(st.filter(x=>x.sleepH!==null).map(x=>x.sleepH)),wakeAvg:avg(st.filter(x=>x.wakeMin!==null).map(x=>x.wakeMin)),sleepMinAvg:avg(st.filter(x=>x.sleepMin!==null).map(x=>x.sleepMin)),
+      wakeSd:sd(st.filter(x=>x.wakeMin!==null).map(x=>x.wakeMin)),sleepSd:sd(st.filter(x=>x.sleepMin!==null).map(x=>x.sleepMin)),
+      sticksShortSleep:avg(short.map(x=>x.sticks)),sticksNormalSleep:avg(normal.map(x=>x.sticks)),shortN:short.length,normalN:normal.length,
+      bestDay:st.length?keys.filter(k=>allDays[k])[st.indexOf(st.reduce((a,b)=>b.sticks<a.sticks?b:a))]:null};
+  }
   function renderHistory(){
     if($("tab-history").hidden) return;
     const keysAll=Object.keys(allDays).sort().reverse();
     $("histEmpty").hidden=keysAll.length>0;
-    let keys, chartKeys, title;
-    if(period==="day"){keys=keysAll.slice(0,60);chartKeys=lastKeys(7);title="Останні 7 днів";}
-    else if(period==="week"){chartKeys=lastKeys(7);keys=chartKeys.slice().reverse();title="Останні 7 днів";}
-    else{chartKeys=lastKeys(30);keys=chartKeys.slice().reverse();title="Останні 30 днів";}
-    // stats over the period
-    const recs=(period==="day"?[allDays[dayKey()]||{meals:[],sticks:[]}]:chartKeys.map(k=>allDays[k]||{meals:[],sticks:[]}));
-    const st=recs.map(dayStats); const n=period==="day"?1:recs.length;
-    const total=st.reduce((a,x)=>a+x.sticks,0), within=st.filter(x=>x.sticks<=settings.limit).length;
-    const gapsAll=st.filter(x=>x.avgGap!==null); const avgGap=gapsAll.length?gapsAll.reduce((a,x)=>a+x.avgGap,0)/gapsAll.length:null;
-    const early=st.reduce((a,x)=>a+x.early+x.fasting,0); const mealsAvg=st.reduce((a,x)=>a+x.meals,0)/n;
-    const maxDay=Math.max(0,...st.map(x=>x.sticks));
-    const periodKeys=period==="day"?[dayKey()]:chartKeys;
-    const sleeps=periodKeys.map(k=>allDays[k]?sleepHours(k,allDays[k]):null).filter(x=>x!==null);
-    const avgSleep=sleeps.length?sleeps.reduce((a,b)=>a+b,0)/sleeps.length:null;
-    const wakes=periodKeys.map(k=>allDays[k]&&allDays[k].wake?Math.round((allDays[k].wake-keyDate(k).setHours(0,0,0,0))/60000):null).filter(x=>x!==null);
-    const avgWake=wakes.length?Math.round(wakes.reduce((a,b)=>a+b,0)/wakes.length):null;
-    const wakeStr=avgWake!==null?`${String(Math.floor(avgWake/60)%24).padStart(2,"0")}:${String(avgWake%60).padStart(2,"0")}`:"–";
-    if(period==="day"){
-      $("histStats").innerHTML=tile(total,"стіків сьогодні",total>settings.limit?"bad":"stick")+tile(st[0].meals+(st[0].snacks?`<small style="font-size:.9rem;color:var(--muted)"> +${st[0].snacks}</small>`:""),"прийомів їжі","meal")
-        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(early,"стіків зарано / натщесерце",early?"bad":"")
-        +tile(avgSleep!==null?avgSleep.toFixed(1)+" год":"–","сон",avgSleep!==null&&avgSleep<7?"bad":"")+tile(wakeStr,"підйом");
+    const isDay=period==="day", span=period==="month"?30:7;
+    const chartKeys=isDay?lastKeys(7):lastKeys(span);
+    const keys=isDay?keysAll.slice(0,60):chartKeys.slice().reverse();
+    const cur=periodAgg(isDay?[dayKey()]:chartKeys), prev=isDay?periodAgg(lastKeys(1,1)):periodAgg(lastKeys(span,span));
+    const stk=streaks(); const dLabel=isDay?"до вчора":"до минулого";
+    const dl=(c,p,low,unit)=>prev.logged?delta(c,p,low,unit).replace("до минулого",dLabel):"";
+    const lim=settings.limit, g=settings.gap;
+    // ---- sticks
+    let t="";
+    if(isDay){
+      t+=tile(cur.total,"стіків сьогодні",lim&&cur.total>lim?"bad":"stick",dl(cur.total,prev.total,true,""));
+      t+=tile(cur.firstAfterWake!==null?fmtH(cur.firstAfterWake):"–","перший стік після підйому",cur.firstAfterWake!==null&&cur.firstAfterWake>=120?"good":"",dl(cur.firstAfterWake,prev.firstAfterWake,false," хв"));
+      t+=tile(cur.avgInterval!==null?fmtH(cur.avgInterval):"–","між стіками в середньому","",dl(cur.avgInterval,prev.avgInterval,false," хв"));
+      t+=tile(cur.longest!==null?fmtH(cur.longest):"–","найдовше без стіка",cur.longest>=240?"good":"");
+      t+=tile(cur.late,"після вечері",cur.late?"bad":"good",dl(cur.late,prev.late,true,""));
+      t+=tile(stk.cur,`днів поспіль у межах цілі<small> · рекорд ${stk.best}</small>`,stk.cur?"good":"");
     }else{
-      $("histStats").innerHTML=tile(total,"стіків усього","stick")+tile((total/n).toFixed(1),"в середньому за день",total/n>settings.limit?"bad":"stick")
-        +tile(`${within}/${n}`,"днів у межах цілі",within<n?"":"meal")+tile(maxDay,"максимум за день",maxDay>settings.limit?"bad":"")
-        +tile(avgGap!==null?Math.round(avgGap)+" хв":"–","середня пауза після їжі",avgGap!==null&&avgGap<settings.gap?"bad":"")+tile(mealsAvg.toFixed(1),"прийомів їжі на день","meal")
-        +tile(avgSleep!==null?avgSleep.toFixed(1)+" год":"–","сон у середньому",avgSleep!==null&&avgSleep<7?"bad":"")+tile(wakeStr,"середній підйом");
+      t+=tile(cur.total,"стіків усього","stick",dl(cur.total,prev.total,true,""));
+      t+=tile(cur.avgPerDay!==null?cur.avgPerDay.toFixed(1):"–","в середньому за день",lim&&cur.avgPerDay>lim?"bad":"stick",dl(cur.avgPerDay,prev.avgPerDay,true,""));
+      t+=tile(`${cur.within}/${cur.logged}`,"днів у межах цілі",cur.logged&&cur.within===cur.logged?"good":"");
+      t+=tile(cur.maxDay,"максимум за день",lim&&cur.maxDay>lim?"bad":"");
+      t+=tile(cur.firstAfterWake!==null?fmtH(cur.firstAfterWake):"–","перший стік після підйому",cur.firstAfterWake>=120?"good":"",dl(cur.firstAfterWake,prev.firstAfterWake,false," хв"));
+      t+=tile(cur.avgInterval!==null?fmtH(cur.avgInterval):"–","між стіками в середньому","",dl(cur.avgInterval,prev.avgInterval,false," хв"));
+      t+=tile(cur.longest!==null?fmtH(cur.longest):"–","найдовша пауза без стіка",cur.longest>=240?"good":"");
+      t+=tile(cur.late,"після вечері за період",cur.late?"bad":"good",dl(cur.late,prev.late,true,""));
+      t+=tile(stk.cur,`днів поспіль у межах цілі<small> · рекорд ${stk.best}</small>`,stk.cur?"good":"");
     }
-    // chart
-    $("histChartTitle").textContent=title; const w=$("histChart"); w.className="week"+(period==="month"?" m":"");
+    $("tilesSticks").innerHTML=t;
+    // ---- hours
+    const bt=cur.buckets.reduce((a,b)=>a+b,0);
+    $("hours").innerHTML=BUCKETS.map((b,i)=>{const v=cur.buckets[i];const pct=bt?Math.round(v/bt*100):0;return `<div><span>${b}<small class="note"> ${["5–12","12–17","17–22","22–5"][i]}</small></span><div class="bar"><i class="${i===3?"night":""}" data-w="${pct}" style="width:0"></i></div><span class="n">${v}${bt?` · ${pct}%`:""}</span></div>`;}).join("");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>$("hours").querySelectorAll("i").forEach(i=>i.style.width=i.dataset.w+"%")));
+    // ---- food
+    t="";
+    t+=tile(cur.okPct!==null?cur.okPct+"%":"–","стіків після повної паузи",cur.okPct===100?"good":cur.okPct!==null&&cur.okPct<70?"bad":"",dl(cur.okPct,prev.okPct,false,"%"));
+    t+=tile(cur.avgGap!==null?fmtH(cur.avgGap):"–","середня пауза після їжі",cur.avgGap!==null&&cur.avgGap<g?"bad":"good",dl(cur.avgGap,prev.avgGap,false," хв"));
+    t+=tile(cur.early,"зарано / натщесерце",cur.early?"bad":"good",dl(cur.early,prev.early,true,""));
+    t+=tile(isDay?cur.mealsAvg!==null?cur.mealsAvg:"–":cur.mealsAvg!==null?cur.mealsAvg.toFixed(1):"–",isDay?"прийомів їжі":"прийомів їжі на день","meal");
+    t+=tile(cur.snacks,isDay?"перекусів":"перекусів за період","");
+    t+=tile(cur.mealGapAvg!==null?fmtH(cur.mealGapAvg):"–","між прийомами їжі","",dl(cur.mealGapAvg,prev.mealGapAvg,true," хв"));
+    t+=tile(cur.mealGapMax!==null?fmtH(cur.mealGapMax):"–","найдовше голодне вікно",cur.mealGapMax>300?"bad":"");
+    t+=tile(cur.lastMealBeforeSleep!==null?fmtH(cur.lastMealBeforeSleep):"–","від останньої їжі до сну",cur.lastMealBeforeSleep!==null?(cur.lastMealBeforeSleep<120?"bad":"good"):"");
+    t+=tile(cur.planDev!==null?Math.round(cur.planDev)+" хв":"–","відхилення від плану",cur.planDev!==null&&cur.planDev>60?"bad":"");
+    if(!isDay) t+=tile(cur.missed,"пропущених прийомів",cur.missed?"bad":"good");
+    $("tilesFood").innerHTML=t;
+    // ---- sleep
+    t="";
+    t+=tile(cur.sleepAvg!==null?cur.sleepAvg.toFixed(1)+" год":"–",isDay?"сон":"сон у середньому",cur.sleepAvg!==null?(cur.sleepAvg<7?"bad":"good"):"",dl(cur.sleepAvg,prev.sleepAvg,false," год"));
+    t+=tile(cur.wakeAvg!==null?hmFromMin(Math.round(cur.wakeAvg)):"–",isDay?"підйом":"середній підйом","");
+    t+=tile(cur.sleepMinAvg!==null?hmFromMin(Math.round(cur.sleepMinAvg)):"–",isDay?"відбій":"середній відбій","");
+    if(!isDay){
+      t+=tile(cur.wakeSd!==null?"±"+Math.round(cur.wakeSd)+" хв":"–","розкид підйому",cur.wakeSd!==null?(cur.wakeSd>60?"bad":"good"):"");
+      t+=tile(cur.sleepSd!==null?"±"+Math.round(cur.sleepSd)+" хв":"–","розкид відбою",cur.sleepSd!==null?(cur.sleepSd>60?"bad":"good"):"");
+      t+=tile(cur.shortN&&cur.normalN?`${cur.sticksShortSleep.toFixed(1)}<small>vs ${cur.sticksNormalSleep.toFixed(1)}</small>`:"–",`стіків після сну &lt;7 год vs ≥7<small>· ${cur.shortN}/${cur.normalN} дн</small>`,cur.shortN&&cur.normalN&&cur.sticksShortSleep>cur.sticksNormalSleep?"bad":"");
+    }
+    $("tilesSleep").innerHTML=t;
+    // ---- report
+    const rep=$("report");
+    if(!isDay&&cur.logged){
+      const pn=period==="month"?"цього місяця":"цього тижня", pp=period==="month"?"минулого місяця":"минулого тижня";
+      const lines=[];
+      lines.push(`<p><b>${cur.total}</b> стіків ${pn}${prev.logged?`, ${cur.total<prev.total?"на <b>"+Math.round((prev.total-cur.total)/Math.max(prev.total,1)*100)+"% менше</b>":cur.total>prev.total?"на <b>"+Math.round((cur.total-prev.total)/Math.max(prev.total,1)*100)+"% більше</b>":"стільки ж"} ніж ${pp}`:""}. У середньому <b>${cur.avgPerDay.toFixed(1)}</b> на день при цілі ${lim||"без ліміту"}.</p>`);
+      if(cur.bestDay) lines.push(`<p>Найкращий день - <b>${keyDate(cur.bestDay).toLocaleDateString("uk-UA",{weekday:"long",day:"numeric",month:"long"})}</b> (${dayStats(allDays[cur.bestDay],cur.bestDay).sticks} стіків). У межах цілі <b>${cur.within} з ${cur.logged}</b> днів${stk.cur?`, зараз серія <b>${stk.cur}</b>`:""}.</p>`);
+      if(cur.okPct!==null) lines.push(`<p>Після повної паузи - <b>${cur.okPct}%</b> стіків${cur.early?`, зарано або натщесерце - <b>${cur.early}</b>`:""}${cur.late?`, після вечері - <b>${cur.late}</b>`:""}.</p>`);
+      if(cur.firstAfterWake!==null) lines.push(`<p>Перший стік у середньому через <b>${fmtH(cur.firstAfterWake)}</b> після підйому${cur.sleepAvg!==null?`, сон <b>${cur.sleepAvg.toFixed(1)} год</b>`:""}.</p>`);
+      const bi=cur.buckets.indexOf(Math.max(...cur.buckets)); if(bt) lines.push(`<p>Найбільше курю ${["зранку","вдень","ввечері","вночі"][bi]} - <b>${Math.round(cur.buckets[bi]/bt*100)}%</b>.</p>`);
+      $("reportTitle").textContent=period==="month"?"Підсумок місяця":"Підсумок тижня"; $("reportBody").innerHTML=lines.join(""); rep.hidden=false;
+    } else rep.hidden=true;
+    // ---- chart
+    $("histChartTitle").textContent=isDay||span===7?"Останні 7 днів":"Останні 30 днів"; const w=$("histChart"); w.className="week"+(span===30&&!isDay?" m":"");
     const cnt=k=>allDays[k]?(allDays[k].sticks||[]).length:0;
-    const max=Math.max(settings.limit,...chartKeys.map(cnt),1);
-    w.innerHTML=chartKeys.map(k=>{const c=cnt(k);const h=Math.round(c/max*44);const over=settings.limit>0&&c>settings.limit;const d=keyDate(k);
-      const lab=period==="month"?(d.getDate()%5===1||chartKeys.length<10?String(d.getDate()):""):d.toLocaleDateString("uk-UA",{weekday:"short"});
-      return `<div class="d"><div class="bar"><i class="${over?"over":""}" data-h="${h}" style="height:2px"></i></div><div class="n">${period==="month"?(c||""):c}</div><div>${lab}</div></div>`;}).join("");
+    const max=Math.max(lim,...chartKeys.map(cnt),1);
+    w.innerHTML=chartKeys.map(k=>{const c=cnt(k);const h=Math.round(c/max*44);const over=lim>0&&c>lim;const d=keyDate(k);const month=!isDay&&span===30;
+      const lab=month?(d.getDate()%5===1||chartKeys.length<10?String(d.getDate()):""):d.toLocaleDateString("uk-UA",{weekday:"short"});
+      return `<div class="d"><div class="bar"><i class="${over?"over":""}" data-h="${h}" style="height:2px"></i></div><div class="n">${month?(c||""):c}</div><div>${lab}</div></div>`;}).join("");
     requestAnimationFrame(()=>requestAnimationFrame(()=>w.querySelectorAll("i").forEach(i=>i.style.height=i.dataset.h+"px")));
-    // list
-    $("histListTitle").textContent=period==="day"?"Усі дні":"Дні періоду";
+    // ---- heatmap: 12 columns = weeks (Mon..Sun), last column is the current week
+    const todayK=dayKey(); const td=keyDate(todayK); const dow=(td.getDay()+6)%7; // 0=Mon
+    const start=new Date(td); start.setDate(td.getDate()-dow-7*11);
+    let cols="";
+    for(let c=0;c<12;c++){let col="";for(let r=0;r<7;r++){const d=new Date(start);d.setDate(start.getDate()+c*7+r);const k=dayKey(new Date(d.getTime()+DAY_SHIFT*MIN+MIN));
+      const future=d>td; const rec=allDays[k]; const n=rec?(rec.sticks||[]).length:0;
+      let lv="";if(rec){lv=n===0?"l0":lim?(n>lim?(n>lim*1.5?"l5":"l4"):n<=lim/3?"l1":n<=lim*2/3?"l2":"l3"):"l3";}
+      col+=`<i class="${lv}${k===todayK?" today":""}${future?" future":""}" title="${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}: ${rec?n:"–"}"></i>`;}
+      cols+=`<div class="col">${col}</div>`;}
+    $("heat").innerHTML=cols;
+    // ---- list
+    $("histListTitle").textContent=isDay?"Усі дні":"Дні періоду";
     $("histList").innerHTML=keys.filter(k=>allDays[k]).map(k=>{
-      const r=allDays[k], x=dayStats(r), d=keyDate(k), over=settings.limit>0&&x.sticks>settings.limit, isOpen=openDay===k;
+      const r=allDays[k], x=dayStats(r,k), d=keyDate(k), over=lim>0&&x.sticks>lim, isOpen=openDay===k;
       const rm=r.meals||[], rs=r.sticks||[];
       const ev=[...rm.map(t=>({k:"meal",t})),...rs.map(t=>({k:"stick",t})),...(r.wake?[{k:"wake",t:r.wake}]:[]),...(r.sleep?[{k:"sleep",t:r.sleep}]:[])].sort((a,b)=>a.t-b.t);
       const sub=isOpen?`<div class="sub">${ev.map(e=>{let note="";if(e.k==="stick"){const prev=[...rm].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)}`:"натщесерце";}
         return `<div class="${e.k}"><span class="t">${hm(e.t)}</span><span>${e.k==="meal"?((r.types||{})[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон"} <span class="note">${note}</span></span></div>`;}).join("")||"<span class=note>порожньо</span>"}</div>`:"";
-      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${(()=>{const sh=sleepHours(k,r);const w=r.wake?hm(r.wake):null;return (sh||w)?`<div class="note" style="margin-top:4px">${w?"підйом "+w:""}${w&&sh?" · ":""}${sh?"сон "+sh.toFixed(1)+" год":""}</div>`:"";})()}${sub}</li>`;
+      const meta=[x.wakeMin!==null?"підйом "+hmFromMin(x.wakeMin):"",x.sleepH!==null?"сон "+x.sleepH.toFixed(1)+" год":"",x.firstAfterWake!==null?"перший стік +"+fmtH(x.firstAfterWake):"",x.late?"після вечері "+x.late:""].filter(Boolean).join(" · ");
+      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${meta?`<div class="note" style="margin-top:4px">${meta}</div>`:""}${sub}</li>`;
     }).join("");
     $("histList").querySelectorAll(".row").forEach(r=>r.onclick=()=>{openDay=openDay===r.dataset.k?null:r.dataset.k;renderHistory();});
   }
-
 
   // ---- pull to refresh (standalone PWA has no native one)
   (function(){
