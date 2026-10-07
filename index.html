@@ -108,6 +108,7 @@ details summary::after{content:"+";color:var(--muted)} details[open] summary::af
 .seg button.on{background:var(--meal-soft);color:var(--meal);font-weight:600}
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.tiles>.tile:last-child:nth-child(odd){grid-column:1/-1}
 .tile .v{font-family:var(--display);font-weight:700;font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
 .tile .l{font-size:.78rem;color:var(--muted);margin-top:2px}
 .tile.stick .v{color:var(--stick)} .tile.meal .v{color:var(--meal)} .tile.bad .v{color:var(--wait)}
@@ -320,7 +321,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">17</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">18</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -551,7 +552,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   const hmFromMin=m=>`${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
   const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
   const sd=a=>{if(a.length<2)return null;const m=avg(a);return Math.sqrt(avg(a.map(x=>(x-m)*(x-m))));};
-  const bucketOf=ms=>{const h=new Date(ms).getHours();return h<5?3:h<12?0:h<17?1:h<22?2:3;};
+  const bucketOf=ms=>{const h=new Date(ms).getHours();return h<5?3:h<12?0:h<17?1:h<23?2:3;};
   const BUCKETS=["Ранок","День","Вечір","Ніч"];
   function slotIndexes(rec,n){ // which plan slot each main meal fills
     const types=rec.types||{}, used=new Set(), out=[];
@@ -661,7 +662,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     $("tilesSticks").innerHTML=t;
     // ---- hours
     const bt=cur.buckets.reduce((a,b)=>a+b,0), bmax=Math.max(1,...cur.buckets);
-    $("hours").innerHTML=BUCKETS.map((b,i)=>{const v=cur.buckets[i];const pct=bt?Math.round(v/bt*100):0;return `<div><span class="lb">${b}<small>${["5–12","12–17","17–22","22–5"][i]}</small></span><div class="bar"><i class="${i===3?"night":""}" data-w="${Math.round(v/bmax*100)}" style="width:0"></i></div><span class="n">${v}${bt?` · ${pct}%`:""}</span></div>`;}).join("");
+    $("hours").innerHTML=BUCKETS.map((b,i)=>{const v=cur.buckets[i];const pct=bt?Math.round(v/bt*100):0;return `<div><span class="lb">${b}<small>${["5–12","12–17","17–23","23–5"][i]}</small></span><div class="bar"><i class="${i===3?"night":""}" data-w="${Math.round(v/bmax*100)}" style="width:0"></i></div><span class="n">${v}${bt?` · ${pct}%`:""}</span></div>`;}).join("");
     requestAnimationFrame(()=>requestAnimationFrame(()=>$("hours").querySelectorAll("i").forEach(i=>i.style.width=i.dataset.w+"%")));
     // ---- food
     t="";
