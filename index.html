@@ -223,7 +223,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .report p{margin:0 0 6px;font-size:.92rem} .report p:last-child{margin:0}
 .report b{font-family:var(--display);font-weight:600}
 .off{margin-left:8px;font:500 .68rem var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--stick);background:var(--stick-soft);border-radius:999px;padding:2px 8px}
-.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);max-width:calc(100% - 32px);text-align:center;background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
@@ -323,7 +323,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">21</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">22</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
