@@ -324,7 +324,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">23</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">24</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -566,7 +566,6 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     window.scrollTo(0,0); if(t==="history")renderHistory();}
   document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
   $("seg").querySelectorAll("button").forEach(b=>b.onclick=()=>{period=b.dataset.p;$("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderHistory();});
-  showTab(curTab);
 
   // ---- history
   const H=3600000, MIN=60000;
@@ -776,7 +775,8 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   window.addEventListener("offline",()=>{netState();toast("Офлайн - записи зберігаються на телефоні");});
   netState();
 
-  // ---- boot
+  // ---- boot (everything above is declared by now - showTab may render history)
+  showTab(curTab);
   render(); setInterval(render,15000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
   loadAll();
