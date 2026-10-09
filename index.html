@@ -224,6 +224,22 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .report p{margin:0 0 6px;font-size:.92rem} .report p:last-child{margin:0}
 .report b{font-family:var(--display);font-weight:600}
 .off{margin-left:8px;font:500 .68rem var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--stick);background:var(--stick-soft);border-radius:999px;padding:2px 8px}
+.stRow{display:flex;gap:14px;align-items:center}
+.stText{min-width:0;flex:1}
+.ring{position:relative;width:96px;height:96px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8;stroke-linecap:round}
+.ring .track{stroke:var(--line)}
+.ring .prog{stroke:var(--wait);stroke-dasharray:276.46;stroke-dashoffset:276.46;transition:stroke-dashoffset 1s linear,stroke .4s}
+.ring.done .prog{stroke:var(--meal)}
+.ringTxt{position:absolute;inset:0;display:grid;place-content:center;text-align:center;line-height:1.05}
+.ringTxt b{font-family:var(--display);font-size:1.15rem;font-variant-numeric:tabular-nums;color:var(--fg)}
+.ringTxt small{font-size:.62rem;color:var(--muted);letter-spacing:.03em;text-transform:uppercase}
+@keyframes ringPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes ringPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.ring.done{animation:ringPulse 1.6s ease-in-out 2}
+.ring.done .ringTxt{animation:ringPop .5s cubic-bezier(.2,.8,.2,1)}
+.ring.hot .prog{filter:drop-shadow(0 0 4px var(--wait))}
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);max-width:calc(100% - 32px);text-align:center;background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -236,8 +252,16 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   <h1><span><svg class="ic"><use href="#i-meal"/></svg>Їжа та стіки<span class="off" id="offline" hidden>офлайн</span></span> <small id="dateLabel"></small></h1>
   <section class="card status" id="status" aria-live="polite">
     <div class="label"><svg class="ic sm"><use href="#i-timer"/></svg>Статус</div>
-    <div class="big" id="stBig">Завантаження…</div>
-    <div class="sub" id="stSub"></div>
+    <div class="stRow">
+      <div class="ring" id="ring" hidden>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="44"/><circle class="prog" id="ringProg" cx="50" cy="50" r="44"/></svg>
+        <div class="ringTxt"><b id="ringMain">--:--</b><small id="ringSub">до стіка</small></div>
+      </div>
+      <div class="stText">
+        <div class="big" id="stBig">Завантаження…</div>
+        <div class="sub" id="stSub"></div>
+      </div>
+    </div>
     <div class="counts">
       <span class="pill meal" id="mealCount">Їжа 0/4</span>
       <span class="pill stick" id="stickCount">Стіки 0/4</span>
@@ -324,7 +348,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">24</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">25</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -502,17 +526,38 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     const nextPlan=plans.find(p=>p>now);
     if(!lastMeal) return {cls:"wait",big:"Спочатку поїж",sub:nextPlan?`Стік натщесерце не варто. Перший прийом їжі за планом о ${hm(nextPlan)}.`:"Стік натщесерце не варто."};
     const okAt=lastMeal+settings.gap*60000;
-    if(now<okAt) return {cls:"wait",big:`Зачекай ще <span class="timer">${fmtDur(okAt-now)}</span>`,sub:`Поїв о ${hm(lastMeal)}, міхур ще спорожнюється. Можна з ${hm(okAt)}.`};
+    if(now<okAt) return {cls:"wait",big:`Зачекай ще <span class="timer">${fmtDur(okAt-now)}</span>`,sub:`Поїв о ${hm(lastMeal)}, міхур ще спорожнюється. Можна з ${hm(okAt)}.`,ring:{from:lastMeal,to:okAt}};
     if(today.sticks.length>=settings.limit&&settings.limit>0) return {cls:"limit",big:"Ціль на сьогодні вичерпана",sub:`Уже ${today.sticks.length} з ${settings.limit}. Кожен наступний - понад план.`};
     let sub=`Після їжі о ${hm(lastMeal)} минуло ${fmtDur(now-lastMeal)}.`;
     if(nextPlan&&nextPlan-now<45*60000) sub+=` Наступна їжа о ${hm(nextPlan)} - встигни до неї.`;
     return {cls:"ok",big:"Можна стік",sub};
   }
+  // ---- countdown ring (ticks every second while waiting)
+  const RING_C=2*Math.PI*44; let ringTimer=null, ringWasWaiting=false;
+  function fmtClock(ms){const t=Math.max(0,Math.ceil(ms/1000));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;return (h?h+":":"")+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");}
+  function ringTick(){
+    const s=statusNow(); const r=$("ring");
+    if(s.ring){
+      const now=Date.now(), total=s.ring.to-s.ring.from, left=s.ring.to-now, p=Math.min(1,Math.max(0,(now-s.ring.from)/total));
+      r.hidden=false; r.classList.remove("done"); r.classList.toggle("hot",left<5*60000);
+      $("ringProg").style.strokeDashoffset=(RING_C*(1-p)).toFixed(2); $("ringMain").textContent=fmtClock(left); $("ringSub").textContent="до стіка";
+      ringWasWaiting=true;
+      if(!ringTimer) ringTimer=setInterval(ringTick,1000);
+    }else{
+      if(ringTimer){clearInterval(ringTimer);ringTimer=null;}
+      if(ringWasWaiting&&s.cls==="ok"){ // just finished: celebrate, then hand over to the text
+        ringWasWaiting=false; r.hidden=false; r.classList.add("done"); $("ringProg").style.strokeDashoffset="0"; $("ringMain").textContent="✓"; $("ringSub").textContent="можна";
+        setTimeout(()=>{r.hidden=true;r.classList.remove("done");},3500); render(); return;
+      }
+      ringWasWaiting=false; if(!r.classList.contains("done")) r.hidden=true;
+    }
+  }
   function render(){
     rolloverCheck();
     const s=statusNow(); const st=$("status"); st.className="card status "+s.cls;
     if(s.cls!==lastStatusCls){lastStatusCls=s.cls;["stBig","stSub"].forEach(id=>{const e=$(id);e.style.animation="none";void e.offsetWidth;e.style.animation="";});}
-    $("stBig").innerHTML=s.big; $("stSub").textContent=s.sub;
+    $("stBig").innerHTML=s.ring?"Зачекай":s.big; $("stSub").textContent=s.sub;
+    ringTick();
     $("mealCount").textContent=`Їжа ${mainMeals().length}/${settings.meals}`;
     $("stickCount").textContent=`Стіки ${today.sticks.length}/${settings.limit}`;
     $("dateLabel").textContent=keyDate(dayKey()).toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"});
@@ -778,6 +823,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   // ---- boot (everything above is declared by now - showTab may render history)
   showTab(curTab);
   render(); setInterval(render,15000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)ringTick();});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
   loadAll();
   $("btnExport").onclick=exportJson;
