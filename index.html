@@ -330,11 +330,11 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     <h2><svg class="ic"><use href="#i-alarm"/></svg>План і ліміти</h2>
     <div class="set">
       <label><span class="lt">Прокидаюсь о<small>Від цього часу будується базовий план: перший прийом їжі через 30 хв після підйому.</small></span><input type="time" id="sWake"></label>
-      <label><span class="lt">Прийомів їжі на день<small>Скільки основних прийомів у плані (сніданок, обід, вечеря...). Перекуси сюди не входять.</small></span><input type="number" id="sMeals" min="3" max="6"></label>
+      <label><span class="lt">Прийомів їжі на день<small>Скільки прийомів у плані. Рахується будь-яка їжа, перекуси теж.</small></span><input type="number" id="sMeals" min="3" max="6"></label>
       <label><span class="lt">Між прийомами їжі, год<small>Крок між прийомами в плані. Остання їжа не пізніше 22:00 - якщо не вміщається, крок стискається.</small></span><input type="number" id="sInterval" min="2" max="6" step="0.5"></label>
       <label><span class="lt">Пауза після їжі, год<small>Скільки чекати після будь-якої їжі (і перекусу), перш ніж можна стік. Поки пауза не минула, кнопка «Стік» попереджає.</small></span><input type="number" id="sGapH" min="1" max="4" step="0.5"></label>
       <label><span class="lt">Ціль стіків на день<small>Після цієї кількості статус показує «ціль вичерпана», а дні понад ціль в історії підсвічуються червоним. 0 - без ліміту.</small></span><input type="number" id="sLimit" min="0" max="20"></label>
-      <div class="hint">Коли відмічаєш сніданок, увесь план зсувається від його реального часу; інші прийоми план не рухають.</div>
+      <div class="hint">Кожен записаний прийом закриває наступний слот плану, а решта слотів рахується від часу останньої їжі через вказаний інтервал.</div>
       <button class="timerow" id="sSave" style="justify-self:start;padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--fg);font:inherit;cursor:pointer">Зберегти</button>
     </div>
   </section>
@@ -348,7 +348,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   </section>
   <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">25</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">26</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -369,7 +369,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   let today={meals:[],sticks:[],types:{},wake:null,sleep:null};
   const TYPES=["Сніданок","Обід","Вечеря","Перекус"];
   let pendingMealMs=null, lastAdded=null, lastStatusCls=null;
-  function mainMeals(){return today.meals.filter(m=>today.types[m]!=="Перекус");}
+  function mainMeals(){return today.meals.slice();} // every meal (snacks too) counts toward the plan
   let allDays={}, loadedKey=null;
 
   // ---- day key: a day starts at 05:00 so late sticks count for the evening before
@@ -394,15 +394,16 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   function basePlan(){return basePlanFor(today,dayKey());}
   function plan(){return planFor(today,dayKey());}
   function planFor(rec,k){
-    const base=basePlanFor(rec,k); const n=base.length; const types=rec.types||{};
-    const bf=(rec.meals||[]).find(m=>types[m]==="Сніданок");
-    if(bf===undefined) return base;
+    const base=basePlanFor(rec,k); const n=base.length;
+    const meals=(rec.meals||[]).slice().sort((a,b)=>a-b);
+    if(!meals.length) return base;
     const dayStart=keyDate(k).setHours(0,0,0,0);
-    const first=Math.round((bf-dayStart)/60000);
-    let step=n>1?base[1]-base[0]:0;
-    const hardLast=22*60; // compress if breakfast was late
-    if(n>1&&first+(n-1)*step>hardLast) step=Math.max(90,(hardLast-first)/(n-1));
-    return Array.from({length:n},(_,i)=>Math.round(first+i*step));
+    const logged=meals.slice(0,n).map(m=>Math.round((m-dayStart)/60000));
+    if(logged.length>=n) return logged;
+    const remaining=n-logged.length; let step=n>1?base[1]-base[0]:0;
+    const hardLast=22*60; const last=logged[logged.length-1];
+    if(last+remaining*step>hardLast) step=Math.max(90,(hardLast-last)/remaining);
+    return logged.concat(Array.from({length:remaining},(_,i)=>Math.round(last+(i+1)*step)));
   }
 
   // ---- storage: IndexedDB (all days kept), localStorage as a last resort
@@ -498,8 +499,8 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   $("btnMealAt").onclick=()=>{const m=customMs();if(m)openChooser(m);else toast("Вкажи час");};
   function openChooser(ms){
     pendingMealMs=ms; $("ask").hidden=true;
-    const n=mainMeals().length, total=settings.meals;
-    const suggest=n===0?"Сніданок":n>=total-1?"Вечеря":"Обід";
+    const n=today.meals.length, total=settings.meals;
+    const suggest=n===0?"Сніданок":n>=total-1?"Вечеря":n===1?"Обід":"Перекус";
     $("chooseTime").textContent=hm(ms);
     $("chooseBtns").innerHTML=TYPES.map(t=>`<button data-t="${t}" class="${t===suggest?"suggest":""}">${t}</button>`).join("");
     $("chooseBtns").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("choose").hidden=true;addEvent("meal",pendingMealMs,b.dataset.t);});
@@ -563,10 +564,9 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     $("dateLabel").textContent=keyDate(dayKey()).toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"});
 
     const now=Date.now(); const pl=plan(); let nextMarked=false;
-    const doneIdx=new Set(); {const n=pl.length; const free=()=>{for(let i=1;i<n-1;i++)if(!doneIdx.has(i))return i;for(let i=0;i<n;i++)if(!doneIdx.has(i))return i;return -1;};
-      mainMeals().forEach(m=>{const t=today.types[m];let i=t==="Сніданок"&&!doneIdx.has(0)?0:t==="Вечеря"&&!doneIdx.has(n-1)?n-1:free();if(i>=0)doneIdx.add(i);});}
+    const doneN=Math.min(today.meals.length,pl.length);
     $("plan").innerHTML=pl.map((m,i)=>{
-      const done=doneIdx.has(i); let cls=done?"done":"";
+      const done=i<doneN; let cls=done?"done":"";
       if(!done&&!nextMarked&&todayAt(m)>now-60*60000){cls="next";nextMarked=true;}
       return `<span class="${cls}">${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</span>`;
     }).join("");
@@ -620,15 +620,12 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   const sd=a=>{if(a.length<2)return null;const m=avg(a);return Math.sqrt(avg(a.map(x=>(x-m)*(x-m))));};
   const bucketOf=ms=>{const h=new Date(ms).getHours();return h<5?3:h<12?0:h<17?1:h<23?2:3;};
   const BUCKETS=["Ранок","День","Вечір","Ніч"];
-  function slotIndexes(rec,n){ // which plan slot each main meal fills
-    const types=rec.types||{}, used=new Set(), out=[];
-    const free=()=>{for(let i=1;i<n-1;i++)if(!used.has(i))return i;for(let i=0;i<n;i++)if(!used.has(i))return i;return -1;};
-    (rec.meals||[]).filter(m=>types[m]!=="Перекус").forEach(m=>{const t=types[m];let i=t==="Сніданок"&&!used.has(0)?0:t==="Вечеря"&&!used.has(n-1)?n-1:free();if(i>=0)used.add(i);out.push([m,i]);});
-    return out;
+  function slotIndexes(rec,n){ // every meal fills the next plan slot in order
+    return (rec.meals||[]).slice().sort((a,b)=>a-b).map((m,i)=>[m,i<n?i:-1]);
   }
   function dayStats(rec,k){
     const meals=(rec.meals||[]).slice().sort((a,b)=>a-b), sticks=(rec.sticks||[]).slice().sort((a,b)=>a-b), types=rec.types||{};
-    const mains=meals.filter(m=>types[m]!=="Перекус");
+    const mains=meals; // all meals count; snacks are only a label
     const gaps=sticks.map(t=>{const prev=[...meals].reverse().find(m=>m<=t);return prev?(t-prev)/MIN:null;});
     const known=gaps.filter(g=>g!==null);
     const ok=gaps.filter(g=>g!==null&&g>=settings.gap).length;
@@ -644,7 +641,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     const n=settings.meals; const pl=planFor(rec,k);
     const dev=slotIndexes(rec,n).filter(([m,i])=>i>=0).map(([m,i])=>Math.abs(minsInDay(m,k)-pl[i]));
     const isToday=k===dayKey();
-    return {sticks:sticks.length,meals:mains.length,snacks:meals.length-mains.length,
+    return {sticks:sticks.length,meals:mains.length,snacks:meals.filter(m=>types[m]==="Перекус").length,
       avgGap:avg(known),early:gaps.filter(g=>g!==null&&g<settings.gap).length,fasting:gaps.filter(g=>g===null).length,ok,
       firstAfterWake:rec.wake&&sticks.length?(sticks[0]-rec.wake)/MIN:null,
       avgInterval:avg(intervals),longest:intervals.length||(rec.wake&&sticks.length)?longest:null,late,buckets,
@@ -793,7 +790,7 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
       const sub=isOpen?`<div class="sub">${ev.map(e=>{let note="";if(e.k==="stick"){const prev=[...rm].reverse().find(m=>m<=e.t);note=prev?`через ${fmtDur(e.t-prev)}`:"натщесерце";}
         return `<div class="${e.k}"><span class="t">${hm(e.t)}</span><span>${e.k==="meal"?((r.types||{})[e.t]||"Їжа"):e.k==="stick"?"Стік":e.k==="wake"?"Підйом":"Сон"} <span class="note">${note}</span></span></div>`;}).join("")||"<span class=note>порожньо</span>"}</div>`:"";
       const meta=[x.wakeMin!==null?"підйом "+hmFromMin(x.wakeMin):"",x.sleepH!==null?"сон "+x.sleepH.toFixed(1)+" год":"",x.firstAfterWake!==null?"перший стік +"+fmtH(x.firstAfterWake):"",x.late?"після вечері "+x.late:""].filter(Boolean).join(" · ");
-      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}${x.snacks?"+"+x.snacks:""}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${meta?`<div class="note" style="margin-top:4px">${meta}</div>`:""}${sub}</li>`;
+      return `<li><div class="row" data-k="${k}"><span class="dt">${d.toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}<small>${d.toLocaleDateString("uk-UA",{weekday:"short"})}</small></span><span class="pill meal">їжа ${x.meals}</span><span class="pill stick ${over?"over":""}">стіки ${x.sticks}</span></div>${meta?`<div class="note" style="margin-top:4px">${meta}</div>`:""}${sub}</li>`;
     }).join("");
     $("histList").querySelectorAll(".row").forEach(r=>r.onclick=()=>{openDay=openDay===r.dataset.k?null:r.dataset.k;renderHistory();});
   }
