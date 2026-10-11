@@ -7,3 +7,9 @@ PWA-трекер прийомів їжі та стіків IQOS. Рахує, к�
 - На iPhone: відкрити в Safari → Поділитися → «На екран Домівка».
 
 Іконки інтерфейсу: [Lucide](https://lucide.dev) (ISC).
+
+## Хмара і сповіщення (Firebase)
+
+- Дані синхронізуються у Firestore під приватним **ключем синхронізації** (Налаштування → Хмара). Той самий ключ на іншому пристрої = ті самі дані.
+- Нагадування про їжу і «можна стік» надсилає Cloud Function `reminders` (щохвилини читає `plans/{key}`).
+- Деплой функцій і правил: GitHub Actions (`.github/workflows/firebase-deploy.yml`), секрет `FIREBASE_TOKEN` з `firebase login:ci`.

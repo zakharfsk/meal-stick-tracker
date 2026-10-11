@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Data lives under a long random sync key (acts as a private link). No accounts.
+    match /spaces/{key}/{document=**} {
+      allow read, write: if key.size() >= 24 && key.size() <= 64;
+    }
+    match /plans/{key} {
+      allow read, write: if key.size() >= 24 && key.size() <= 64;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

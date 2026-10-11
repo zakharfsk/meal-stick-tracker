@@ -240,13 +240,20 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 .ring.done{animation:ringPulse 1.6s ease-in-out 2}
 .ring.done .ringTxt{animation:ringPop .5s cubic-bezier(.2,.8,.2,1)}
 .ring.hot .prog{filter:drop-shadow(0 0 4px var(--wait))}
+.keyRow{display:grid;grid-template-columns:1fr auto auto;gap:6px}
+.keyRow input{font:inherit;font-size:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0;width:100%}
+.keyRow button{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--fg);cursor:pointer}
+.set label.chk{display:flex;align-items:center;gap:8px;border:0;padding:0}
+.set label.chk input{width:auto}
+.cloudDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:1px}
+.cloudDot.on{background:var(--meal)} .cloudDot.off{background:var(--wait)}
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);max-width:calc(100% - 32px);text-align:center;background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><!-- Lucide icons (ISC) --><symbol id="i-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /> <path d="M7 2v20" /> <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol><symbol id="i-stick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 12H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14" /> <path d="M18 8c0-2.5-2-2.5-2-5" /> <path d="M21 16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /> <path d="M22 8c0-2.5-2-2.5-2-5" /> <path d="M7 12v4" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <polyline points="12 6 12 12 16.5 12" /></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01" /> <path d="M3 18h.01" /> <path d="M3 6h.01" /> <path d="M8 12h13" /> <path d="M8 18h13" /> <path d="M8 6h13" /></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></symbol><symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /> <path d="M12 7v5l4 2" /></symbol><symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="17 8 12 3 7 8" /> <line x1="12" x2="12" y1="3" y2="15" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol><symbol id="i-bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /> <path d="M2 8h18a2 2 0 0 1 2 2v10" /> <path d="M2 17h20" /> <path d="M6 8v9" /></symbol><symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8" /> <path d="m4.93 10.93 1.41 1.41" /> <path d="M2 18h2" /> <path d="M20 18h2" /> <path d="m19.07 10.93-1.41 1.41" /> <path d="M22 22H2" /> <path d="m8 6 4-4 4 4" /> <path d="M16 18a4 4 0 0 0-8 0" /></symbol><symbol id="i-alarm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol><symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /> <path d="M20 3v4" /> <path d="M22 5h-4" /> <path d="M4 17v2" /> <path d="M5 18H3" /></symbol><symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4" /> <path d="M16 2v4" /> <rect width="18" height="18" x="3" y="4" rx="2" /> <path d="M3 10h18" /> <path d="M8 14h.01" /> <path d="M12 14h.01" /> <path d="M16 14h.01" /> <path d="M8 18h.01" /> <path d="M12 18h.01" /> <path d="M16 18h.01" /></symbol><symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /> <polyline points="16 7 22 7 22 13" /></symbol><symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7" /> <polyline points="16 17 22 17 22 11" /></symbol><symbol id="i-flat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><!-- Lucide icons (ISC) --><symbol id="i-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /> <path d="M7 2v20" /> <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></symbol><symbol id="i-stick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 12H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14" /> <path d="M18 8c0-2.5-2-2.5-2-5" /> <path d="M21 16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /> <path d="M22 8c0-2.5-2-2.5-2-5" /> <path d="M7 12v4" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <polyline points="12 6 12 12 16.5 12" /></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01" /> <path d="M3 18h.01" /> <path d="M3 6h.01" /> <path d="M8 12h13" /> <path d="M8 18h13" /> <path d="M8 6h13" /></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></symbol><symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /> <path d="M12 7v5l4 2" /></symbol><symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="17 8 12 3 7 8" /> <line x1="12" x2="12" y1="3" y2="15" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol><symbol id="i-bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /> <path d="M2 8h18a2 2 0 0 1 2 2v10" /> <path d="M2 17h20" /> <path d="M6 8v9" /></symbol><symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8" /> <path d="m4.93 10.93 1.41 1.41" /> <path d="M2 18h2" /> <path d="M20 18h2" /> <path d="m19.07 10.93-1.41 1.41" /> <path d="M22 22H2" /> <path d="m8 6 4-4 4 4" /> <path d="M16 18a4 4 0 0 0-8 0" /></symbol><symbol id="i-alarm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8" /> <path d="M12 9v4l2 2" /> <path d="M5 3 2 6" /> <path d="m22 6-3-3" /> <path d="M6.38 18.7 4 21" /> <path d="M17.64 18.67 20 21" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol><symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /> <path d="M20 3v4" /> <path d="M22 5h-4" /> <path d="M4 17v2" /> <path d="M5 18H3" /></symbol><symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4" /> <path d="M16 2v4" /> <rect width="18" height="18" x="3" y="4" rx="2" /> <path d="M3 10h18" /> <path d="M8 14h.01" /> <path d="M12 14h.01" /> <path d="M16 14h.01" /> <path d="M8 18h.01" /> <path d="M12 18h.01" /> <path d="M16 18h.01" /></symbol><symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /> <polyline points="16 7 22 7 22 13" /></symbol><symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7" /> <polyline points="16 17 22 17 22 11" /></symbol><symbol id="i-flat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /></symbol><symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" /></symbol><symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0" /> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></symbol></svg>
 <div class="wrap">
 <main class="tab" id="tab-home">
   <h1><span><svg class="ic"><use href="#i-meal"/></svg>Їжа та стіки<span class="off" id="offline" hidden>офлайн</span></span> <small id="dateLabel"></small></h1>
@@ -347,8 +354,23 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     </div>
   </section>
   <section class="card">
+    <h2><svg class="ic"><use href="#i-cloud"/></svg>Хмара і сповіщення</h2>
+    <p class="note" style="margin:0 0 10px" id="cloudState">Підключення…</p>
+    <div class="set">
+      <label><span class="lt">Ключ синхронізації<small>Це твій приватний ключ. Введи його на іншому пристрої - і дані синхронізуються. Нікому не показуй.</small></span></label>
+      <div class="keyRow"><input type="text" id="syncKey" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="keyCopy">Копіювати</button><button id="keyApply">Застосувати</button></div>
+      <div class="askBtns">
+        <button id="btnNotif"><svg class="ic sm"><use href="#i-bell"/></svg>Увімкнути сповіщення</button>
+        <button id="btnNotifTest" hidden>Тест за 1 хв</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="nStick" checked> Нагадувати, коли можна стік</label>
+      <label class="chk"><input type="checkbox" id="nMeal" checked> Нагадувати про прийоми їжі</label>
+      <p class="note" id="notifState" style="margin:0"></p>
+    </div>
+  </section>
+  <section class="card">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Оновлення</h2>
-    <p class="note" style="margin:0 0 10px">Версія <span id="ver">26</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
+    <p class="note" style="margin:0 0 10px">Версія <span id="ver">27</span>. Нова версія підтягується сама при відкритті; якщо щось не оновилось - натисни.</p>
     <button id="btnUpdate" class="filebtn" style="width:100%"><svg class="ic sm"><use href="#i-refresh"/></svg>Оновити додаток</button>
   </section>
 </main>
@@ -361,6 +383,9 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
 <div class="ptr" id="ptr"><span><svg class="ic sm"><use href="#i-refresh"/></svg><span id="ptrText">Потягни, щоб оновити</span></span></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"></script>
 <script>
 (function(){
   const $=id=>document.getElementById(id);
@@ -415,15 +440,17 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   function lsSave(obj){try{localStorage.setItem(LS,JSON.stringify(obj));}catch(e){}}
 
   async function saveToday(){
-    rolloverCheck(); const k=dayKey(); const rec={meals:today.meals,sticks:today.sticks,types:today.types,wake:today.wake||null,sleep:today.sleep||null};
+    rolloverCheck(); const k=dayKey(); const rec={meals:today.meals,sticks:today.sticks,types:today.types,wake:today.wake||null,sleep:today.sleep||null,updatedAt:Date.now()};
     if(idb){try{await tx("days","readwrite",st=>st.put(rec,k));}catch(e){toast("Не вдалося зберегти");}}
     const all=lsLoad(); all.days=all.days||{}; all.days[k]=rec; lsSave(all);
     allDays[k]=rec; render();
+    cloud.pushDay(k,rec); cloud.pushPlan();
   }
   async function saveSettings(){
     if(idb){try{await tx("settings","readwrite",st=>st.put(settings,"main"));}catch(e){}}
+    settings.updatedAt=Date.now();
     const all=lsLoad();all.settings=settings;lsSave(all);
-    render(); toast("Збережено");
+    render(); toast("Збережено"); cloud.pushSettings(); cloud.pushPlan();
   }
   function openIdbTimeout(ms){return Promise.race([openIdb(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("idb timeout")),ms))]);}
   function applyData(days,st){
@@ -795,6 +822,96 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
     $("histList").querySelectorAll(".row").forEach(r=>r.onclick=()=>{openDay=openDay===r.dataset.k?null:r.dataset.k;renderHistory();});
   }
 
+
+  // ---- cloud sync (Firestore, keyed by a private sync key; local storage stays the source of truth offline)
+  const FB_CONFIG={apiKey:"AIzaSyCGtI9ENgpq4sHdKyTn6NUGWfA3_SSCXrU",authDomain:"meal-stick-tracker.firebaseapp.com",projectId:"meal-stick-tracker",storageBucket:"meal-stick-tracker.firebasestorage.app",messagingSenderId:"19994207262",appId:"1:19994207262:web:dc54e05c073398856a7a0f"};
+  const VAPID="BMc5jgorZwN2ttw8XeSFqKWcthMiQui6URuxocy4xebrsU5qm7jgXOnUp-7RZgCdxFR-DbHIg1cU1pHgVYgpTYQ";
+  const KEY_LS="mst-sync-key";
+  function newKey(){const a=new Uint8Array(24);crypto.getRandomValues(a);return Array.from(a,b=>"abcdefghijklmnopqrstuvwxyz0123456789"[b%36]).join("");}
+  const cloud=(()=>{
+    let fs=null, key=null, unsubDays=null, unsubSet=null, ready=false, swReg=null, pushToken=null;
+    try{key=localStorage.getItem(KEY_LS);}catch(e){}
+    if(!key||key.length<24){key=newKey();try{localStorage.setItem(KEY_LS,key);}catch(e){}}
+    function state(txt,cls){const el=$("cloudState");if(el)el.innerHTML=`<span class="cloudDot ${cls||""}"></span>${txt}`;}
+    function space(){return fs.collection("spaces").doc(key);}
+    function init(){
+      $("syncKey").value=key;
+      if(!window.firebase||!firebase.firestore){state("Firebase не завантажився - працюю локально","off");return;}
+      try{firebase.initializeApp(FB_CONFIG);fs=firebase.firestore();}catch(e){state("Помилка ініціалізації","off");return;}
+      fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); // offline queue for writes
+      ready=true; $("syncKey").value=key; subscribe();
+    }
+    function subscribe(){
+      if(unsubDays)unsubDays(); if(unsubSet)unsubSet();
+      state("Синхронізація…");
+      unsubDays=space().collection("days").onSnapshot(snap=>{
+        let changed=false;
+        snap.docChanges().forEach(ch=>{const k=ch.doc.id,c=ch.doc.data();const l=allDays[k];
+          if(ch.type==="removed")return;
+          if(!l||(c.updatedAt||0)>(l.updatedAt||0)){allDays[k]=c;changed=true;}});
+        if(changed){const ls=lsLoad();ls.days=allDays;lsSave(ls);if(idb)for(const k in allDays)tx("days","readwrite",s=>s.put(allDays[k],k)).catch(()=>{});setToday(dayKey());render();}
+        // first snapshot: upload local days the cloud doesn't have (migration)
+        if(!subscribe.migrated){subscribe.migrated=true;const cloudKeys=new Set(snap.docs.map(d=>d.id));
+          Object.keys(allDays).forEach(k=>{if(!cloudKeys.has(k))space().collection("days").doc(k).set(allDays[k]).catch(()=>{});});
+          pushSettings(); pushPlan();}
+        state(snap.metadata.fromCache?"Офлайн - зміни синхронізуються пізніше":"Синхронізовано · "+new Date().toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"}),snap.metadata.fromCache?"":"on");
+      },err=>{state("Немає доступу до хмари: "+(err.code||err.message),"off");});
+      unsubSet=space().collection("meta").doc("settings").onSnapshot(d=>{
+        if(!d.exists)return;const c=d.data();if((c.updatedAt||0)>(settings.updatedAt||0)){settings={...DEF,...c};const ls=lsLoad();ls.settings=settings;lsSave(ls);render();}
+      },()=>{});
+    }
+    function pushDay(k,rec){if(!ready)return;space().collection("days").doc(k).set(rec).catch(()=>{});}
+    function pushSettings(){if(!ready)return;space().collection("meta").doc("settings").set(settings).catch(()=>{});}
+    function pushPlan(){ // what the server should remind about
+      if(!ready)return;
+      const items=[]; const nMeal=$("nMeal").checked, nStick=$("nStick").checked, now=Date.now();
+      if(nMeal){const pl=plan();const done=today.meals.length;
+        pl.forEach((m,i)=>{if(i<done)return;const at=todayAt(m);if(at<now-60000)return;
+          const label=i===0?"Сніданок":i===pl.length-1?"Вечеря":i===1?"Обід":"Перекус";
+          items.push({id:"meal-"+dayKey()+"-"+i,kind:"meal",at,title:"Час їсти - "+label.toLowerCase(),body:`За планом о ${hm(at)}. Після їжі відміть «Я поїв».`});});}
+      if(nStick){const s=statusNow();if(s.ring)items.push({id:"stick-"+s.ring.to,kind:"stick",at:s.ring.to,title:"Можна стік",body:`Минуло ${fmtDur(settings.gap*60000)} після їжі о ${hm(s.ring.from)}.`});}
+      const nextAt=items.length?Math.min(...items.map(i=>i.at)):null;
+      const doc={items,nextAt,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,updatedAt:now};
+      if(pushToken)doc.tokens=firebase.firestore.FieldValue.arrayUnion(pushToken);
+      fs.collection("plans").doc(key).set(doc,{merge:true}).catch(()=>{});
+      // forget notified marks for ids that are gone (keeps the doc small)
+    }
+    async function enablePush(){
+      const st=$("notifState");
+      if(!("Notification" in window)){st.textContent="Сповіщення недоступні у цьому режимі. На iPhone додай застосунок на екран Домівка і відкрий звідти.";return;}
+      if(!ready){st.textContent="Хмара ще не підключена.";return;}
+      try{
+        const perm=await Notification.requestPermission();
+        if(perm!=="granted"){st.textContent="Дозвіл не надано. Увімкни в Налаштуваннях iOS → Сповіщення.";return;}
+        swReg=swReg||await navigator.serviceWorker.ready;
+        const m=firebase.messaging();
+        pushToken=await m.getToken({vapidKey:VAPID,serviceWorkerRegistration:swReg});
+        try{localStorage.setItem("mst-push",pushToken);}catch(e){}
+        await fs.collection("plans").doc(key).set({tokens:firebase.firestore.FieldValue.arrayUnion(pushToken)},{merge:true});
+        st.textContent="Сповіщення увімкнені на цьому пристрої."; $("btnNotif").innerHTML='<svg class="ic sm"><use href="#i-bell"/></svg>Сповіщення увімкнені'; $("btnNotifTest").hidden=false;
+        pushPlan();
+      }catch(e){st.textContent="Не вдалося: "+(e.code||e.message);}
+    }
+    async function testPush(){ if(!ready||!pushToken)return; const at=Date.now()+60000;
+      await fs.collection("plans").doc(key).set({items:[{id:"test-"+at,kind:"test",at,title:"Тест сповіщення",body:"Якщо ти це бачиш - усе працює."}],nextAt:at,updatedAt:Date.now()},{merge:true});
+      toast("Прийде приблизно за хвилину. Можна закрити додаток."); }
+    async function refreshToken(){ // tokens rotate; refresh silently when already allowed
+      if(!ready||!("Notification" in window)||Notification.permission!=="granted")return;
+      try{swReg=swReg||await navigator.serviceWorker.ready;pushToken=await firebase.messaging().getToken({vapidKey:VAPID,serviceWorkerRegistration:swReg});
+        $("notifState").textContent="Сповіщення увімкнені на цьому пристрої."; $("btnNotif").innerHTML='<svg class="ic sm"><use href="#i-bell"/></svg>Сповіщення увімкнені'; $("btnNotifTest").hidden=false; pushPlan();}catch(e){}
+    }
+    function applyKey(){const v=$("syncKey").value.trim().toLowerCase();
+      if(!/^[a-z0-9]{24,64}$/.test(v)){toast("Ключ: 24-64 символи, латиниця і цифри");return;}
+      if(v===key)return; key=v; try{localStorage.setItem(KEY_LS,key);}catch(e){} subscribe.migrated=false; subscribe(); toast("Ключ застосовано");}
+    return {init,pushDay,pushSettings,pushPlan,enablePush,testPush,refreshToken,applyKey,getKey:()=>key};
+  })();
+  $("keyApply").onclick=cloud.applyKey;
+  $("keyCopy").onclick=()=>{const v=$("syncKey").value;navigator.clipboard&&navigator.clipboard.writeText(v).then(()=>toast("Скопійовано")).catch(()=>{$("syncKey").select();});};
+  $("btnNotif").onclick=cloud.enablePush;
+  $("btnNotifTest").onclick=cloud.testPush;
+  $("nMeal").onchange=$("nStick").onchange=()=>{try{localStorage.setItem("mst-notif",JSON.stringify({meal:$("nMeal").checked,stick:$("nStick").checked}));}catch(e){}cloud.pushPlan();};
+  try{const n=JSON.parse(localStorage.getItem("mst-notif")||"null");if(n){$("nMeal").checked=!!n.meal;$("nStick").checked=!!n.stick;}}catch(e){}
+
   // ---- pull to refresh (standalone PWA has no native one)
   (function(){
     const el=$("ptr"), txt=$("ptrText"); let y0=null, pulled=0; const TH=80;
@@ -820,9 +937,9 @@ details.more summary::after,details.more[open] summary::after{content:none!impor
   // ---- boot (everything above is declared by now - showTab may render history)
   showTab(curTab);
   render(); setInterval(render,15000);
+  loadAll().then(()=>{cloud.init();setTimeout(cloud.refreshToken,1500);});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)ringTick();});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
-  loadAll();
   $("btnExport").onclick=exportJson;
   $("importFile").onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value="";};
   if("serviceWorker" in navigator){

@@ -1,0 +1,17 @@
+name: Deploy Firebase (functions + rules)
+on:
+  push:
+    branches: [main]
+    paths: ["functions/**", "firestore.rules", "firebase.json", ".firebaserc", ".github/workflows/firebase-deploy.yml"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: npm ci --prefix functions || npm install --prefix functions
+      - run: npx firebase-tools@13 deploy --only functions,firestore:rules --project meal-stick-tracker --non-interactive --force
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
