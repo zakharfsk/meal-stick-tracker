@@ -1261,6 +1261,7 @@
       try {
         firebase.initializeApp(FB_CONFIG);
         fs = firebase.firestore();
+        fs.settings({ experimentalAutoDetectLongPolling: true, ignoreUndefinedProperties: true });
       } catch {
         state("Помилка ініціалізації", "off");
         return;
@@ -1277,6 +1278,7 @@
       unsubDays = space()
         .collection("days")
         .onSnapshot(
+          { includeMetadataChanges: true }, // fires again when the cache view becomes a server view
           (snap) => {
             let changed = false;
             snap.docChanges().forEach((ch) => {

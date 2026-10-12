@@ -1,4 +1,4 @@
-const CACHE = "meal-stick-v28";
+const CACHE = "meal-stick-v29";
 const ASSETS = [
   "./",
   "./index.html",
