@@ -10,8 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: npm ci --prefix functions || npm install --prefix functions
-      - run: npx firebase-tools@13 deploy --only functions,firestore:rules --project meal-stick-tracker --non-interactive --force
+        with: { node-version: "22" }
+      - run: npm install --prefix functions
+      - run: npm install -g firebase-tools@latest
+      - name: Remove a half-created function from a previous failed deploy (ignored if absent)
+        run: firebase functions:delete reminders --region europe-west1 --project meal-stick-tracker --force || true
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Deploy
+        run: firebase deploy --only functions,firestore:rules --project meal-stick-tracker --non-interactive --force --debug 2>&1 | tee deploy.log | grep -vE "^\[debug\] .*(<<< \[apiv2\]\[body\]|>>> \[apiv2\]\[body\])" ; test ${PIPESTATUS[0]} -eq 0
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Show the real error if deploy failed
+        if: failure()
+        run: grep -iE "error|denied|permission|failed|status" deploy.log | grep -v "apiv2\]\[body" | tail -60
