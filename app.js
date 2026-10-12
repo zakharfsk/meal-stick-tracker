@@ -504,6 +504,97 @@
       if (!r.classList.contains("done")) r.hidden = true;
     }
   }
+  // ---- keyed DOM sync: update children in place so nothing re-animates on a routine render
+  function syncChildren(parent, items, keyOf, update, create, onRemove) {
+    const byKey = new Map();
+    for (const el of parent.children) if (el.dataset.key) byKey.set(el.dataset.key, el);
+    let prev = null;
+    items.forEach((it, i) => {
+      const key = keyOf(it, i);
+      let el = byKey.get(key);
+      const fresh = !el;
+      if (fresh) {
+        el = create(it);
+        el.dataset.key = key;
+      } else byKey.delete(key);
+      update(el, it, fresh);
+      const want = prev ? prev.nextSibling : parent.firstChild;
+      if (el !== want) parent.insertBefore(el, want);
+      prev = el;
+    });
+    byKey.forEach((el) => (onRemove ? onRemove(el) : el.remove()));
+  }
+  const ICON_OF = { meal: "meal", stick: "stick", wake: "sunrise", sleep: "moon" };
+  function labelOf(e) {
+    return e.k === "meal"
+      ? today.types[e.t] || "Їжа"
+      : e.k === "stick"
+        ? "Стік"
+        : e.k === "wake"
+          ? "Підйом"
+          : "Сон";
+  }
+  function renderTimeline(ev) {
+    syncChildren(
+      $("timeline"),
+      ev,
+      (e) => e.k + "-" + e.t,
+      (li, e, fresh) => {
+        let note = "";
+        if (e.k === "stick") {
+          const prev = [...today.meals].reverse().find((m) => m <= e.t);
+          note = prev ? `+${fmtDur(e.t - prev)} після їжі` : "натщесерце";
+        }
+        const cls = e.k + (fresh && e.t === lastAdded ? " new" : "");
+        if (li.className !== cls && !li.classList.contains("confirm")) li.className = cls;
+        const t = li.querySelector(".t");
+        const lab = li.querySelector(".lab");
+        const nt = li.querySelector(".note");
+        if (t.textContent !== hm(e.t)) t.textContent = hm(e.t);
+        if (lab.textContent !== labelOf(e)) lab.textContent = labelOf(e);
+        if (nt.textContent !== note) nt.textContent = note;
+        const b = li.querySelector("button");
+        b.dataset.k = e.k;
+        b.dataset.t = e.t;
+      },
+      (e) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="t"></span><span class="k"><svg class="ic sm"><use href="#i-${ICON_OF[e.k]}"/></svg><span class="lab"></span> <span class="note"></span></span><button aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button>`;
+        li.querySelector("button").onclick = onDeleteTap;
+        return li;
+      },
+      (li) => {
+        if (li.classList.contains("removing")) return li.remove();
+        li.classList.add("removing");
+        setTimeout(() => li.remove(), 200);
+      }
+    );
+  }
+  function onDeleteTap(ev) {
+    ev.stopPropagation();
+    const b = ev.currentTarget;
+    const li = b.closest("li");
+    if (!li.classList.contains("confirm")) {
+      $("timeline")
+        .querySelectorAll("li.confirm")
+        .forEach((x) => cancelConfirm(x));
+      li.classList.add("confirm");
+      b.innerHTML = "Видалити?";
+      b.setAttribute("aria-label", "Підтвердити видалення");
+      li._t = setTimeout(() => cancelConfirm(li), 4000);
+      return;
+    }
+    clearTimeout(li._t);
+    li.classList.remove("confirm");
+    li.classList.add("removing");
+    lastAdded = null;
+    setTimeout(() => {
+      if (b.dataset.k === "wake" || b.dataset.k === "sleep") {
+        today[b.dataset.k] = null;
+        saveToday();
+      } else removeEvent(b.dataset.k, +b.dataset.t);
+    }, 180);
+  }
   function render() {
     rolloverCheck();
     const s = statusNow();
@@ -533,17 +624,25 @@
     const pl = plan();
     let nextMarked = false;
     const doneN = Math.min(today.meals.length, pl.length);
-    $("plan").innerHTML = pl
-      .map((m, i) => {
-        const done = i < doneN;
-        let cls = done ? "done" : "";
-        if (!done && !nextMarked && todayAt(m) > now - 60 * 60000) {
-          cls = "next";
-          nextMarked = true;
-        }
-        return `<span class="${cls}">${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}</span>`;
-      })
-      .join("");
+    const chips = pl.map((m, i) => {
+      const done = i < doneN;
+      let cls = done ? "done" : "";
+      if (!done && !nextMarked && todayAt(m) > now - 60 * 60000) {
+        cls = "next";
+        nextMarked = true;
+      }
+      return { cls, text: hmFromMin(m) };
+    });
+    syncChildren(
+      $("plan"),
+      chips,
+      (c, i) => "p" + i,
+      (el, c) => {
+        el.className = c.cls;
+        if (el.textContent !== c.text) el.textContent = c.text;
+      },
+      () => document.createElement("span")
+    );
 
     if (document.activeElement !== $("wakeIn")) $("wakeIn").value = today.wake ? hm(today.wake) : "";
     if (document.activeElement !== $("sleepIn")) $("sleepIn").value = today.sleep ? hm(today.sleep) : "";
@@ -562,57 +661,7 @@
       ...(today.sleep ? [{ k: "sleep", t: today.sleep }] : []),
     ].sort((a, b) => a.t - b.t);
     $("tlEmpty").hidden = ev.length > 0;
-    $("timeline").innerHTML = ev
-      .map((e) => {
-        let note = "";
-        if (e.k === "stick") {
-          const prev = [...today.meals].reverse().find((m) => m <= e.t);
-          note = prev ? `+${fmtDur(e.t - prev)} після їжі` : "натщесерце";
-        } else {
-          note = "";
-        }
-        const label =
-          e.k === "meal"
-            ? today.types[e.t] || "Їжа"
-            : e.k === "stick"
-              ? "Стік"
-              : e.k === "wake"
-                ? "Підйом"
-                : "Сон";
-        const ico = { meal: "meal", stick: "stick", wake: "sunrise", sleep: "moon" }[e.k];
-        return `<li class="${e.k}${e.t === lastAdded ? " new" : ""}"><span class="t">${hm(e.t)}</span><span class="k"><svg class="ic sm"><use href="#i-${ico}"/></svg>${label} <span class="note">${note}</span></span><button data-k="${e.k}" data-t="${e.t}" aria-label="Видалити"><svg class="ic sm"><use href="#i-trash"/></svg></button></li>`;
-      })
-      .join("");
-    $("timeline")
-      .querySelectorAll("button")
-      .forEach(
-        (b) =>
-          (b.onclick = (ev) => {
-            ev.stopPropagation();
-            const li = b.closest("li");
-            if (!li.classList.contains("confirm")) {
-              // first tap: ask
-              $("timeline")
-                .querySelectorAll("li.confirm")
-                .forEach((x) => cancelConfirm(x));
-              li.classList.add("confirm");
-              b.innerHTML = "Видалити?";
-              b.setAttribute("aria-label", "Підтвердити видалення");
-              li._t = setTimeout(() => cancelConfirm(li), 4000);
-              return;
-            }
-            clearTimeout(li._t);
-            li.classList.remove("confirm");
-            li.classList.add("removing");
-            setTimeout(() => {
-              lastAdded = null;
-              if (b.dataset.k === "wake" || b.dataset.k === "sleep") {
-                today[b.dataset.k] = null;
-                saveToday();
-              } else removeEvent(b.dataset.k, +b.dataset.t);
-            }, 180);
-          })
-      );
+    renderTimeline(ev);
     if (lastAdded !== null)
       setTimeout(() => {
         lastAdded = null;
@@ -657,7 +706,16 @@
   try {
     curTab = localStorage.getItem("mst-tab") || "home";
   } catch {}
+  function withTransition(fn) {
+    if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches)
+      document.startViewTransition(fn);
+    else fn();
+  }
   function showTab(t) {
+    if (t === curTab && !$("tab-" + t).hidden) return;
+    withTransition(() => showTabNow(t));
+  }
+  function showTabNow(t) {
     curTab = t;
     try {
       localStorage.setItem("mst-tab", t);
@@ -673,11 +731,14 @@
     .forEach(
       (b) =>
         (b.onclick = () => {
-          period = b.dataset.p;
-          $("seg")
-            .querySelectorAll("button")
-            .forEach((x) => x.classList.toggle("on", x === b));
-          renderHistory();
+          if (period === b.dataset.p) return;
+          withTransition(() => {
+            period = b.dataset.p;
+            $("seg")
+              .querySelectorAll("button")
+              .forEach((x) => x.classList.toggle("on", x === b));
+            renderHistory();
+          });
         })
     );
 
@@ -685,8 +746,9 @@
   const H = 3600000,
     MIN = 60000;
   const minsInDay = (ms, k) => Math.round((ms - keyDate(k).setHours(0, 0, 0, 0)) / MIN);
-  const hmFromMin = (m) =>
-    `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  function hmFromMin(m) {
+    return `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  }
   const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
   const sd = (a) => {
     if (a.length < 2) return null;
@@ -861,8 +923,20 @@
         : null,
     };
   }
-  function renderHistory() {
+  let histSig = "";
+  function renderHistory(force) {
     if ($("tab-history").hidden) return;
+    const sig = JSON.stringify([
+      period,
+      openDay,
+      settings,
+      dayKey(),
+      Object.keys(allDays).map((k) => k + ":" + (allDays[k].updatedAt || 0)),
+      today.meals.length,
+      today.sticks.length,
+    ]);
+    if (!force && sig === histSig) return;
+    histSig = sig;
     const keysAll = Object.keys(allDays).sort().reverse();
     $("histEmpty").hidden = keysAll.length > 0;
     const isDay = period === "day",
@@ -1206,8 +1280,10 @@
       .forEach(
         (r) =>
           (r.onclick = () => {
-            openDay = openDay === r.dataset.k ? null : r.dataset.k;
-            renderHistory();
+            withTransition(() => {
+              openDay = openDay === r.dataset.k ? null : r.dataset.k;
+              renderHistory();
+            });
           })
       );
   }
@@ -1613,7 +1689,12 @@
         if (r) await Promise.race([r.update(), new Promise((res) => setTimeout(res, 3000))]);
       }
     } catch {}
-    location.reload();
+    try {
+      await loadAll();
+    } catch {}
+    histSig = "";
+    render();
+    toast("Оновлено");
   }
 
   // ---- online/offline indicator (data is local either way)

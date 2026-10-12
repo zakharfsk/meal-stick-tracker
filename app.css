@@ -1385,3 +1385,181 @@ details.more[open] summary::after {
     transition: none;
   }
 }
+
+/* ---- smoothness pass (iPhone) ---- */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+.tabbar,
+.seg,
+.act,
+summary {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+/* View Transitions: cross-fade the page root, slide the tab content, keep list rows glued to their keys */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease-out;
+}
+.tab {
+  view-transition-name: tab;
+}
+::view-transition-old(tab) {
+  animation: 0.18s ease-in both vtOut;
+}
+::view-transition-new(tab) {
+  animation: 0.24s ease-out both vtIn;
+}
+@keyframes vtOut {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes vtIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.tab {
+  animation: none; /* the view transition now owns tab entry */
+}
+#histStats,
+#tilesSticks,
+#tilesFood,
+#tilesSleep,
+#histChart,
+#hours,
+#reportBody {
+  view-transition-name: none;
+}
+
+/* rows that already exist never re-animate; only new ones enter */
+.tl li {
+  will-change: transform, opacity;
+}
+.tl li.removing {
+  pointer-events: none;
+}
+
+/* buttons: soft press, no outline flash on touch */
+.act,
+.askBtns button,
+.filebtn,
+.timerow button,
+.sleep button,
+.keyRow button,
+.seg button,
+.tabbar button {
+  transition:
+    transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+.act:active {
+  transform: scale(0.97);
+  filter: brightness(0.95);
+}
+
+/* status card: color shifts glide instead of snapping */
+.card.status {
+  transition: border-color 0.35s ease;
+}
+.status.ok {
+  border-color: color-mix(in srgb, var(--meal) 45%, var(--line));
+}
+.status.wait {
+  border-color: color-mix(in srgb, var(--wait) 35%, var(--line));
+}
+.status.limit {
+  border-color: color-mix(in srgb, var(--stick) 45%, var(--line));
+}
+.status .big {
+  transition: color 0.35s ease;
+}
+.pill {
+  transition:
+    transform 0.15s ease,
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* chooser / confirm cards: fold out, not pop */
+.choose:not([hidden]),
+.ask:not([hidden]) {
+  animation: foldIn 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: top center;
+}
+@keyframes foldIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0.96);
+  }
+}
+
+/* heatmap cells and chart bars ease in once */
+.heat i {
+  transition: background-color 0.4s ease;
+}
+.week .bar i {
+  transition: height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* number tiles: value changes cross-fade via a subtle scale */
+.tile .v {
+  animation: none;
+}
+.tile {
+  animation: fadeUp 0.28s ease-out both;
+}
+.tiles > .tile:nth-child(2) {
+  animation-delay: 0.03s;
+}
+.tiles > .tile:nth-child(3) {
+  animation-delay: 0.06s;
+}
+.tiles > .tile:nth-child(4) {
+  animation-delay: 0.09s;
+}
+.tiles > .tile:nth-child(5) {
+  animation-delay: 0.12s;
+}
+.tiles > .tile:nth-child(6) {
+  animation-delay: 0.15s;
+}
+.tiles > .tile:nth-child(n + 7) {
+  animation-delay: 0.18s;
+}
+
+/* toast and pull indicator */
+.toast {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.toast.show {
+  animation: none;
+  transform: translate(-50%, 0);
+}
+.toast:not(.show) {
+  transform: translate(-50%, 8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
