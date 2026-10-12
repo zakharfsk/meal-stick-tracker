@@ -19,7 +19,7 @@ exports.reminders = onSchedule({ schedule: "every 1 minutes", timeZone: "Europe/
     const tokens = Array.isArray(p.tokens) ? p.tokens : [];
     const items = Array.isArray(p.items) ? p.items : []; // [{at, title, body, id}]
     const notified = p.notified || {};
-    const due = items.filter(i => i.at <= now && !notified[i.id]);
+    const due = items.filter((i) => i.at <= now && !notified[i.id]);
     const updates = { notified: { ...notified } };
     const badTokens = new Set();
     for (const it of due) {
@@ -31,21 +31,29 @@ exports.reminders = onSchedule({ schedule: "every 1 minutes", timeZone: "Europe/
         data: { kind: it.kind || "meal", id: String(it.id) },
         webpush: {
           headers: { Urgency: "high", TTL: "1200" },
-          notification: { title: it.title, body: it.body, icon: ICON, badge: ICON, tag: "mst-" + it.kind, renotify: true },
+          notification: {
+            title: it.title,
+            body: it.body,
+            icon: ICON,
+            badge: ICON,
+            tag: "mst-" + it.kind,
+            renotify: true,
+          },
           fcmOptions: { link: APP_URL },
         },
       });
       res.responses.forEach((r, i) => {
         if (!r.success) {
           const code = r.error && r.error.code;
-          if (code === "messaging/registration-token-not-registered" || code === "messaging/invalid-argument") badTokens.add(tokens[i]);
+          if (code === "messaging/registration-token-not-registered" || code === "messaging/invalid-argument")
+            badTokens.add(tokens[i]);
         }
       });
     }
     // next due time among items not yet notified
-    const rest = items.filter(i => !updates.notified[i.id]).map(i => i.at);
+    const rest = items.filter((i) => !updates.notified[i.id]).map((i) => i.at);
     updates.nextAt = rest.length ? Math.min(...rest) : null;
-    if (badTokens.size) updates.tokens = tokens.filter(t => !badTokens.has(t));
+    if (badTokens.size) updates.tokens = tokens.filter((t) => !badTokens.has(t));
     await doc.ref.set(updates, { merge: true });
   }
 });
