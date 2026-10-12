@@ -1371,18 +1371,28 @@
       if (nMeal) {
         const pl = plan();
         const done = today.meals.length;
+        const LOG_AFTER = 30 * 60000; // follow-up: "did you log it?" half an hour after the slot
         pl.forEach((m, i) => {
-          if (i < done) return;
+          if (i < done) return; // this slot is already filled by a logged meal
           const at = todayAt(m);
-          if (at < now - 60000) return;
           const label = i === 0 ? "Сніданок" : i === pl.length - 1 ? "Вечеря" : i === 1 ? "Обід" : "Перекус";
-          items.push({
-            id: "meal-" + dayKey() + "-" + i,
-            kind: "meal",
-            at,
-            title: "Час їсти - " + label.toLowerCase(),
-            body: `За планом о ${hm(at)}. Після їжі відміть «Я поїв».`,
-          });
+          if (at >= now - 60000)
+            items.push({
+              id: "meal-" + dayKey() + "-" + i,
+              kind: "meal",
+              at,
+              title: "Час їсти - " + label.toLowerCase(),
+              body: `За планом о ${hm(at)}. Після їжі відміть «Я поїв».`,
+            });
+          // Disappears automatically: logging the meal re-runs pushPlan and this slot becomes "done".
+          if (at + LOG_AFTER >= now - 60000)
+            items.push({
+              id: "log-" + dayKey() + "-" + i,
+              kind: "log",
+              at: at + LOG_AFTER,
+              title: "Записав їжу?",
+              body: `${label} був за планом о ${hm(at)}, а запису ще немає. Якщо поїв - відміть «Я поїв».`,
+            });
         });
       }
       if (nStick) {
